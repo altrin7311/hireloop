@@ -1,0 +1,64 @@
+---
+description: API route rules in src/app/api/
+globs: src/app/api/**
+alwaysApply: false
+---
+
+# Backend API Rules
+
+## Auth on Every Route
+Every route handler must start with:
+  const supabase = createClient()
+  const { data: { user }, error } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
+
+## Response Shape
+Always return consistent shape:
+  Success: { success: true, data: T }
+  Error:   { success: false, error: string }
+  
+Use NextResponse.json() — never Response.json()
+
+## Input Validation
+Every POST route:
+  const body = await request.json()
+  const parsed = SomeSchema.safeParse(body)
+  if (!parsed.success) return NextResponse.json({ success: false, error: parsed.error.message }, { status: 400 })
+
+## Route Responsibilities
+
+### POST /api/documents
+- Validate file type (PDF, md, txt only) and size (max 10MB)
+- Upload to Supabase Storage: path = `{userId}/{fileId}/{filename}`
+- Trigger Trigger.dev job: ingest-document
+- Return: { fileId, status: 'processing' }
+
+### POST /api/jobs
+- Accept: { jobUrl?: string, rawText?: string }
+- If URL: call browser/extract.ts to scrape job posting
+- Validate extracted text > 200 chars
+- Trigger: orchestrator.runJobAnalysis()
+- Return: { jobId, analysis: JobAnalysis }
+
+### POST /api/generate  (streaming)
+- Accept: { jobId, userId }
+- Return: ReadableStream (SSE)
+- Use Vercel AI SDK's createStreamableValue or manual SSE
+- Run orchestrator.runFullPipeline() — pipe stream events to response
+- On complete: save generated content to Supabase
+
+### POST /api/apply
+- Accept: { applicationId } (user has confirmed the generated content)
+- Trigger: Trigger.dev job: submit-application
+- Return: { jobId, status: 'submitting' }
+
+## Rate Limiting
+/api/generate: 10 calls per user per day (Upstash Redis rate limiter)
+/api/apply: 10 calls per user per day
+Return 429 with message: "Daily limit reached. Resets at midnight UTC."
+
+## Trigger.dev Webhook
+POST /api/webhooks/trigger
+- Verify webhook signature
+- Update job status in Supabase based on event type
+- Emit real-time update via Supabase Realtime to frontend

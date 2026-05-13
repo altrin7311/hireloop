@@ -1,0 +1,71 @@
+---
+description: Rules for Stagehand browser automation in src/lib/browser/
+globs: src/lib/browser/**
+alwaysApply: false
+---
+
+# Browser Automation Rules
+
+## Stagehand (AI-native Playwright by Browserbase)
+Stagehand wraps Playwright with AI understanding of page structure.
+Use it for all form-filling — it handles dynamic/complex application forms
+that traditional selectors would break on.
+
+Import: import { Stagehand } from '@browserbasehq/stagehand'
+
+## Cloud Browser (Browserbase)
+Always run in Browserbase cloud — never local Playwright in production.
+Local Playwright only in development/testing.
+
+```typescript
+const stagehand = new Stagehand({
+  env: 'BROWSERBASE',
+  apiKey: process.env.BROWSERBASE_API_KEY,
+  projectId: process.env.BROWSERBASE_PROJECT_ID,
+  verbose: 1
+})
+```
+
+## Application Extraction (src/lib/browser/extract.ts)
+When given a job URL:
+1. Open in Stagehand
+2. Extract: { title, company, description, applicationUrl, requiredFields }
+3. Close browser
+4. Return structured JobPosting object
+
+## Application Submission (src/lib/browser/apply.ts)
+Flow:
+1. Open application URL in Stagehand
+2. Identify all form fields (Stagehand's `page.observe()`)
+3. Classify each field (name, email, CV upload, cover letter, open-ended Q)
+4. Fill using Stagehand's `page.act()` for each field
+5. Pause before final submit — take screenshot, return for user confirmation
+6. After user confirms: complete submission
+7. Return: { success, confirmationText, screenshotUrl }
+
+## Field Classification
+| Field Type | How to Fill |
+|---|---|
+| name / email / phone / location | Pull from userPreferences directly |
+| CV upload | Upload tailored CV as PDF (generate from JSON) |
+| cover letter textarea | Inject generated cover letter text |
+| "Why do you want to work here?" | Generate fresh short-form answer via Claude |
+| Salary | Use userPreferences.salaryExpectation |
+| Work authorization yes/no | userPreferences.workAuthorization |
+| Open-ended (anything else) | Generate via Claude with job context |
+
+## Open-Ended Question Handling
+For any field not in the list above:
+  const answer = await generateFieldAnswer({
+    question: fieldLabel,
+    jobAnalysis,
+    userProfile,
+    maxWords: 150
+  })
+Use a dedicated mini-prompt for this — not the full CV pipeline.
+
+## Rules
+- Never submit without taking a final screenshot for user review
+- Log every field filled: { fieldLabel, valueSummary, timestamp }
+- Timeout: 90 seconds per application — if exceeded, fail gracefully with screenshot
+- On error: save session screenshot, throw structured error with field that failed

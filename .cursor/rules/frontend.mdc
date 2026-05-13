@@ -1,0 +1,71 @@
+---
+description: Frontend component rules in src/app/ and src/components/
+globs: src/app/**, src/components/**
+alwaysApply: false
+---
+
+# Frontend Rules
+
+## Component Decisions
+- Default to Server Components (no 'use client')
+- Add 'use client' only when: using hooks, browser APIs, event handlers, or streaming
+- Data fetching in Server Components or TanStack Query — never in useEffect
+
+## File Structure
+- One component per file
+- Co-locate tests: button.tsx → button.test.tsx
+- shadcn components in src/components/ui/ — never edit these manually
+- Custom components in src/components/{domain}/
+
+## Styling
+- Tailwind utility classes only — no inline styles, no CSS modules
+- Use cn() from '@/lib/utils' for conditional classes
+- Dark mode via Tailwind's dark: prefix — test both modes
+- No magic numbers — use Tailwind scale (p-4, not p-[17px])
+
+## The 5 Key Screens (must be polished — demo quality)
+
+### 1. Document Upload (src/components/upload/)
+- Drag-and-drop zone accepting: PDF, .md, .txt
+- Per-file status: uploading → parsing → chunking → embedded ✓
+- Error state per file with actionable message
+- Show extracted page/section count after parsing
+
+### 2. Questionnaire (src/components/questionnaire/)
+- One question per screen (not a long form)
+- Progress: "Step 3 of 8" with progress bar
+- Skip button on optional questions
+- Answers persist to Zustand immediately, save to Supabase on completion
+
+### 3. Job Input (src/app/(dashboard)/jobs/)
+- Large textarea for paste OR URL input
+- Scrape URL client-side animation (progress dots)
+- Show match score immediately after analysis: color-coded bar
+  (< 40: red warning, 40–70: amber proceed, > 70: green full steam)
+
+### 4. Generation View (src/components/generation/)
+- Agent timeline on the left (Job Analyst ✓ → Relevancy ✓ → Writing... → QA)
+- Streaming CV content on the right — words appear in real time
+- Toggle between CV and Cover Letter tabs
+- "Edit" button opens inline editor at any point
+
+### 5. Review + Diff (src/components/generation/cv-diff.tsx)
+- Side-by-side: Original (left) | Tailored (right)
+- Highlight additions in green, removals in red
+- "Accept" and "Submit" are separate buttons — user must review
+- QA warnings shown as amber banners above the diff
+
+## Loading States
+- Skeleton loaders for all async content (never spinner-only)
+- Streaming content shows progressive reveal (words appearing), not loading state
+- Error states must be human-readable — no raw error messages shown to user
+
+## Accessibility
+- All interactive elements: aria-label or visible label
+- Keyboard navigable (Tab order must be logical)
+- WCAG AA contrast minimum
+
+## Performance
+- Images via next/image
+- Dynamic import heavy components (diff viewer, PDF preview)
+- Route-level code splitting is automatic — don't fight it

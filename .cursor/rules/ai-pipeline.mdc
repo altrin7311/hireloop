@@ -1,0 +1,67 @@
+---
+description: Rules for the multi-agent pipeline in src/lib/ai/
+globs: src/lib/ai/**
+alwaysApply: false
+---
+
+# AI Pipeline Rules
+
+## The 5-Agent Pipeline
+Job Analyst → Relevancy → [CV Writer ‖ Cover Letter Writer] → QA Checker
+See AGENTS.md for full spec. These rules cover how to write them.
+
+## Agent File Pattern
+Every agent file must export:
+  1. Input type (TypeScript interface)
+  2. Output type (TypeScript interface)
+  3. Zod schema for the output (for runtime validation)
+  4. The agent async function: (input: T, trace: LangfuseTrace) => Promise<U>
+
+Example:
+  export interface JobAnalystInput { rawJobDescription: string }
+  export interface JobAnalysis { roleTitle: string; mustHaveSkills: string[]; ... }
+  export const JobAnalysisSchema = z.object({ roleTitle: z.string(), ... })
+  export async function runJobAnalyst(input: JobAnalystInput, trace: LangfuseTrace): Promise<JobAnalysis>
+
+## Prompt Rules
+- All prompts in src/lib/ai/prompts/ — named with version: job-analyst.v1.ts
+- Prompt files export: PROMPT_VERSION, PROMPT_NAME, buildPrompt(input) => string
+- Always use XML tags for context blocks: <job_description>, <retrieved_experience>
+- Output format instruction: always last, always explicit JSON schema
+- Temperature: 0.1 for extraction, 0.4 for CV rewriting, 0.7 for cover letter
+
+## Structured Output
+Use Claude's tool_use for structured extraction (JobAnalystAgent, QACheckerAgent):
+  tools: [{ name: 'output', description: '...', input_schema: zodToJsonSchema(schema) }]
+  tool_choice: { type: 'tool', name: 'output' }
+
+Use streaming text for writing tasks (CVWriterAgent, CoverLetterAgent).
+
+## Retry Logic
+Wrap every LLM call:
+  async function withRetry<T>(fn: () => Promise<T>, maxAttempts = 2): Promise<T>
+  On retry: inject the error message back into the prompt
+  On final failure: throw with context for orchestrator to handle
+
+## Parallel Execution
+CVWriterAgent and CoverLetterAgent run in parallel via LangGraph:
+  Use Promise.all([cvWriter(state), coverLetter(state)]) inside the graph
+  Never await them sequentially
+
+## Hallucination Prevention (critical)
+CVWriterAgent prompt must include:
+  "You may ONLY reference skills, technologies, tools, and experiences
+   present verbatim or by clear implication in <retrieved_experience>.
+   If a skill from <job_requirements> is NOT in <retrieved_experience>,
+   do NOT include it. Acknowledge the gap in writingNotes instead."
+
+QACheckerAgent verifies this — if it finds a skill not in source chunks,
+it flags severity: 'blocker'.
+
+## Stream Events
+The orchestrator emits these events to the SSE endpoint:
+  { type: 'agent:start', agent: 'job-analyst' }
+  { type: 'agent:complete', agent: 'job-analyst', durationMs: 1240 }
+  { type: 'content:delta', field: 'coverLetter', text: 'Dear hiring' }
+  { type: 'pipeline:complete', matchScore: 82 }
+  { type: 'pipeline:error', message: '...' }

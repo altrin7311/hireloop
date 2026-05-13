@@ -1,0 +1,73 @@
+---
+description: Tech stack rules — exact imports, patterns, and library usage
+alwaysApply: true
+---
+
+# Tech Stack Rules
+
+## Package Manager
+Always use pnpm. Never npm or yarn.
+
+## Imports — Always Use Path Aliases
+import { something } from '@/lib/...'  ✅
+import { something } from '../../../lib/...'  ❌
+
+## Next.js Patterns
+- Use Server Components by default — only add 'use client' when truly needed
+- All data fetching in Server Components or Route Handlers
+- Use next/server for middleware auth
+- Streaming: use Vercel AI SDK's `streamText` or `createStreamableUI`
+
+## Supabase
+Server client (API routes, server components):
+  import { createClient } from '@/lib/db/supabase/server'
+  
+Browser client (client components only):
+  import { createClient } from '@/lib/db/supabase/client'
+
+NEVER use the service_role key in client components.
+
+## Drizzle ORM
+- Schema lives in src/lib/db/schema.ts
+- Queries in src/lib/db/queries/*.ts — one file per domain
+- Always use typed queries — never raw SQL unless Drizzle can't express it
+- Migrations: pnpm drizzle-kit generate → pnpm drizzle-kit migrate
+
+## Zod Validation
+- Every API route input validated with Zod before processing
+- Every agent input/output type has a matching Zod schema in src/validation/schemas.ts
+- Use z.infer<typeof schema> to derive TypeScript types — single source of truth
+
+## Anthropic / Vercel AI SDK
+- Import Anthropic SDK: import Anthropic from '@anthropic-ai/sdk'
+- Import Vercel AI SDK: import { streamText, generateText } from 'ai'
+- All calls must set: model, max_tokens, temperature (never use defaults silently)
+- Always use streaming: streamText not generateText for user-facing responses
+
+## LangGraph.js
+- Graph definitions in src/lib/ai/agents/orchestrator.ts
+- Each node is a pure async function: (state: PipelineState) => Partial<PipelineState>
+- State is immutable — always return new partial state, never mutate
+- Use typed edges — no string-typed edge conditions
+
+## Langfuse Tracing
+Every LLM call must be wrapped:
+  const trace = langfuse.trace({ name: 'agent-name', userId })
+  const generation = trace.generation({ name: 'prompt-name', model, input })
+  // ... make LLM call
+  generation.end({ output, usage })
+
+## TanStack Query
+- All server state via useQuery / useMutation
+- Invalidate queries after mutations — never manually update cache
+- Use suspense mode for loading states
+
+## Zustand
+- One store per domain: user-profile.store.ts, generation.store.ts
+- Use slices pattern for large stores
+- Never store derived state — compute it
+
+## Error Handling
+- All try/catch must handle the error meaningfully — no empty catch blocks
+- API routes return consistent shape: { success: bool, data?: T, error?: string }
+- Use Sentry.captureException for unexpected errors

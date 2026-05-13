@@ -1,0 +1,62 @@
+---
+description: Security rules — always apply everywhere, no exceptions
+alwaysApply: true
+---
+
+# Security Rules
+
+## Secrets
+- Never hardcode API keys or secrets
+- All secrets in .env.local (gitignored)
+- .env.example must list every required variable with a placeholder
+- Never log environment variables — not even to confirm they loaded
+
+## PII Handling
+User CVs, personal details, and questionnaire answers are PII.
+- Never log extracted CV text or personal details
+- Never include raw PII in error messages returned to client
+- Supabase Storage paths scoped to userId — no cross-user access
+- RLS (Row Level Security) enabled and tested on every table
+
+## Row Level Security — Required Policies
+
+For every table:
+  -- Users can only read/write their own rows
+  CREATE POLICY "user_owns_row" ON table_name
+    FOR ALL USING (auth.uid() = user_id);
+
+Never bypass RLS with the service_role key in client-side code.
+Service role key: server only, never exposed to browser.
+
+## Prompt Injection Defense
+User-uploaded documents may contain adversarial text.
+Before injecting any user content into a prompt:
+  1. Strip known injection patterns: "ignore previous", "new instruction", "system:", "###"
+  2. Limit chunk length — never inject > 2000 tokens from a single chunk
+  3. Wrap user content in XML tags (Claude treats inner content as data, not instruction)
+
+## Auth Verification
+Every API route must verify auth — see backend-api.mdc.
+Middleware must protect all /dashboard routes.
+
+```typescript
+// src/middleware.ts
+export async function middleware(request: NextRequest) {
+  const supabase = createMiddlewareClient({ req: request, res })
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session && request.nextUrl.pathname.startsWith('/dashboard')) {
+    return NextResponse.redirect(new URL('/sign-in', request.url))
+  }
+}
+```
+
+## Rate Limiting
+Use Upstash Redis for distributed rate limiting.
+Apply to: /api/generate, /api/apply, /api/documents (10/day each)
+Never rely on client-side throttling alone.
+
+## Interview-Ready Security Explanation
+"CVs contain PII — I apply GDPR-style principles: storage encrypted at rest
+via Supabase, access scoped via RLS so users can only read their own data,
+service_role key never exposed to the browser, and prompt injection mitigated
+by sanitizing and XML-wrapping all user content before it enters any LLM call."

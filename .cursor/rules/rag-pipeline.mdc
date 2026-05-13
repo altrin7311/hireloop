@@ -1,0 +1,76 @@
+---
+description: RAG ingestion and retrieval rules in src/lib/rag/
+globs: src/lib/rag/**
+alwaysApply: false
+---
+
+# RAG Pipeline Rules
+
+## Ingestion (Trigger.dev background job)
+Flow: Upload → Supabase Storage → LlamaParse → Chunk → Voyage Embed → Pinecone upsert
+
+Never run ingestion synchronously in an API route.
+Always trigger via Trigger.dev after upload completes.
+
+## LlamaParse
+- Use 'markdown' output mode — preserves structure better than plain text
+- Enable 'fast_mode' for .md and .txt — LlamaParse overhead not needed
+- On parse failure: fall back to pdf-parse (basic), never silently swallow
+- Validate: extracted text must be > 100 chars or flag as empty
+
+## Chunking Strategy (section-aware, not fixed-token)
+
+| File Type | Chunk By | Max Chunk Tokens |
+|---|---|---|
+| CV (PDF) | Section headers (Experience / Education / Skills / Projects / Summary) | 500 |
+| Cover Letter | Single chunk | 800 |
+| .md / .txt | H2 headers, then 400 tokens if no headers | 400 |
+| LinkedIn export | Section (About / Experience / Education / Certifications) | 500 |
+| GitHub README | One chunk per repo (title + first 300 tokens of README) | 300 |
+
+Tag every chunk:
+  { userId, sourceFile, chunkType, chunkIndex, fileType, uploadedAt, wordCount }
+
+## Voyage AI Embeddings
+Model: voyage-3 (1024 dimensions, outperforms text-embedding-3-large for retrieval)
+Batch size: 64 chunks per API call (rate limit aware)
+Store dimensions as vector(1024) in Supabase AND in Pinecone
+
+Pinecone upsert format:
+  { id: `${userId}-${chunkId}`, values: embedding, metadata: chunk_metadata }
+  Namespace: userId (one namespace per user for isolation)
+
+## Retrieval
+Query: embed the mustHaveSkills array joined as a sentence (not the full JD — too noisy)
+Search: Pinecone query, topK=20, namespace=userId, filter by chunkType
+Rerank: Cohere rerank-v3.5 with job description as query → take top 8
+
+Return structure:
+  { experienceChunks, skillsChunks, projectChunks, educationChunks, matchScore }
+
+## Match Scoring
+matchScore = weighted average of cosine similarity scores:
+  experience chunks × 0.5
+  skills chunks × 0.3
+  projects chunks × 0.2
+
+## Pinecone Schema
+Index name: hireloop-docs
+Dimensions: 1024
+Metric: cosine
+Namespaces: one per userId
+Metadata fields: sourceFile, chunkType, fileType, uploadedAt, wordCount
+
+## Supabase Table: document_chunks
+id uuid primary key
+user_id uuid references auth.users not null
+source_file text not null
+chunk_type text not null
+chunk_index integer not null
+content text not null
+word_count integer
+pinecone_id text unique not null
+file_type text not null
+uploaded_at timestamptz default now()
+
+(Embedding stored in Pinecone only — not in Supabase to avoid bloat)

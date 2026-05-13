@@ -1,0 +1,60 @@
+---
+description: Testing rules — all new code must be testable
+globs: src/**/*.test.ts, src/**/*.test.tsx, e2e/**
+alwaysApply: false
+---
+
+# Testing Rules
+
+## Framework
+Unit + Integration: Vitest
+E2E: Playwright
+Component: Storybook (optional, for UI-heavy components)
+
+## Test File Location
+Co-locate unit tests: src/lib/ai/agents/job-analyst.test.ts
+E2E tests in: e2e/ directory at root
+
+## What Requires Tests
+
+### Unit tests (Vitest)
+- Every agent function in src/lib/ai/agents/
+- Every chunking strategy in src/lib/rag/chunking/
+- Every Zod schema (valid + invalid inputs)
+- Match scoring logic
+
+### Integration tests (Vitest)
+- API routes: mock Supabase + mock Anthropic, test request/response
+- Trigger.dev jobs: test the job logic with mocked external services
+
+### E2E tests (Playwright)
+- Full generation flow: upload CV → paste job → generate → review → (don't submit)
+- Auth flow: sign-up → sign-in → protected route
+- Upload flow: drag-and-drop → extraction status → embedded confirmation
+
+## Mocking Strategy
+- Mock Anthropic SDK: return fixture responses from src/__mocks__/
+- Mock Supabase: use Supabase's local dev stack (supabase start)
+- Mock Pinecone: jest/vitest mock returning fixture embeddings
+- Mock Voyage AI: return deterministic vectors for test chunks
+
+## Agent Test Pattern
+```typescript
+describe('JobAnalystAgent', () => {
+  it('extracts required skills from job description', async () => {
+    const mockClaude = vi.fn().mockResolvedValue(fixtureJobAnalysis)
+    const result = await runJobAnalyst({ rawJobDescription: fixtures.jobJD }, mockTrace)
+    expect(result.mustHaveSkills).toContain('TypeScript')
+    expect(result.seniority).toBe('senior')
+  })
+  
+  it('handles malformed LLM response with retry', async () => {
+    // First call returns garbage, second returns valid JSON
+  })
+})
+```
+
+## Coverage Requirements
+Agent functions: 80% line coverage minimum
+API routes: happy path + auth failure + validation failure covered
+RAG retrieval: test with empty results, single result, full results

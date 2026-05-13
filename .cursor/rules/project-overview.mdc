@@ -1,0 +1,36 @@
+---
+description: HireLoop project context and non-negotiable principles. Always apply.
+alwaysApply: true
+---
+
+# HireLoop — Production AI Job Application Agent
+
+## What This Is
+HireLoop is a production-grade AI job application agent. It ingests user documents,
+runs a multi-agent LLM pipeline, and auto-fills job applications using browser automation.
+Every decision should be production-quality — not prototype quality.
+
+## Non-Negotiable Principles
+1. TypeScript strict mode everywhere — no `any`, no `@ts-ignore`
+2. All LLM calls traced via Langfuse — every call must have a trace
+3. All user data (CVs, personal info) is PII — never log, never expose, RLS on all tables
+4. Never submit an application without explicit user confirmation
+5. Generated content must only reference skills present in user's own documents
+6. Every async function must handle errors — no unhandled promise rejections
+7. Stream everything — never block the UI waiting for full LLM completion
+
+## Architecture
+- Frontend + API: Next.js 15 App Router (TypeScript)
+- Agent framework: LangGraph.js (stateful multi-agent graph)
+- RAG: Voyage AI embeddings → Pinecone → Cohere rerank
+- Document parsing: LlamaParse
+- Background jobs: Trigger.dev v3
+- Browser automation: Stagehand (AI-native Playwright)
+- Database: Supabase (PostgreSQL + Auth + Storage + RLS)
+- ORM: Drizzle ORM
+- Observability: Langfuse + Sentry
+
+## Source of Truth
+CLAUDE.md → operational guide for Claude Code
+AGENTS.md → agent architecture spec
+This file → Cursor coding rules
