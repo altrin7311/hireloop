@@ -1,174 +1,379 @@
 # CLAUDE.md — HireLoop
+# STATUS: FINAL LOCKED SPEC — do not deviate without explicit instruction
 
-You are building **HireLoop**, a production-grade AI job application agent.
-Read this file fully at the start of every session before touching any code.
-This is your single source of truth.
-
----
-
-## What HireLoop Does
-
-HireLoop automates job applications end-to-end:
-
-1. User uploads their CV (PDF), cover letter, GitHub URL, LinkedIn URL, and any `.md`/`.txt` supporting docs
-2. User completes a one-time pre-apply questionnaire (tone, preferences, exclusions)
-3. User pastes a job posting URL or text
-4. HireLoop runs a multi-agent pipeline:
-   - Extracts job requirements
-   - Retrieves the most relevant chunks from user documents via RAG
-   - Generates a tailored CV and cover letter
-   - Runs a QA pass to verify no hallucinated skills
-5. User reviews a side-by-side diff of original vs tailored content
-6. User confirms → HireLoop auto-fills and submits the application via browser automation
+Read this fully at the start of every session. This is your single source of truth.
 
 ---
 
-## Tech Stack (do not deviate without a comment explaining why)
+## What HireLoop Is
 
-| Layer | Technology | Why |
+HireLoop is a **precision job application agent** — the explicit counter to spray-and-pray bots.
+It submits fewer applications than competitors, but each one is tailored, human-sounding,
+and sent through behaviour that avoids platform detection.
+
+Core positioning: "5 perfect applications beat 500 generic ones."
+
+---
+
+## What It Does
+
+1. User uploads CV (PDF), cover letter, GitHub URL, LinkedIn URL, optional .md/.txt docs
+2. User completes a one-time questionnaire (tone, preferences, exclusions, industry)
+3. HireLoop scrapes job listings from all 5 platforms on a schedule
+4. Each listing is scored for match AND checked for ghost job signals
+5. Ghost jobs are auto-skipped before any AI generation is triggered
+6. User browses the ranked Job Feed and either applies manually or enables Precision Auto-Apply
+7. A 5-agent AI pipeline generates a tailored CV + cover letter using a hybrid LLM strategy
+8. User reviews output with a side-by-side diff, edits inline, confirms
+9. The Stealth Engine submits the application via Selenium — with human-like behaviour
+10. Application is logged; user manually marks interview callbacks in the dashboard
+
+---
+
+## Tech Stack (FINAL — do not change)
+
+| Layer | Technology | Reason |
 |---|---|---|
-| Framework | Next.js 15 (App Router) | Best full-stack React, native streaming, RSC |
-| Language | TypeScript (strict mode) | Type safety across the entire codebase |
-| Styling | Tailwind CSS v4 + shadcn/ui | Best DX, production-quality components |
-| Animations | Framer Motion | Streaming reveal, transitions |
-| Server state | TanStack Query v5 | Caching, background refetch, optimistic UI |
+| Framework | Next.js 15 (App Router) | Full-stack, streaming, RSC |
+| Language | TypeScript strict | Type safety everywhere |
+| Styling | Tailwind CSS v4 + shadcn/ui | Speed + quality |
+| Animations | Framer Motion | Streaming reveals, transitions |
+| Server state | TanStack Query v5 | Caching, optimistic UI |
 | Client state | Zustand | Lightweight, no boilerplate |
-| Forms | React Hook Form + Zod | Type-safe forms and validation |
-| AI SDK | Vercel AI SDK + Anthropic SDK | Best streaming/agent DX |
-| LLM | claude-sonnet-4-20250514 | Best instruction following and JSON output |
-| Agent framework | LangGraph.js | Stateful multi-agent workflows |
-| Embeddings | Voyage AI (voyage-3) | Outperforms OpenAI for document retrieval |
-| Vector DB | Pinecone Serverless | Production-grade managed vector search |
-| Document parsing | LlamaParse | Best PDF parsing for RAG (handles tables, complex layouts) |
-| Database | Supabase (PostgreSQL) | DB + Auth + Storage + Realtime in one |
-| ORM | Drizzle ORM | Type-safe, lightweight, best Supabase DX |
-| Auth | Supabase Auth | Native Supabase integration, row-level security |
-| File storage | Supabase Storage | Scoped to user, encrypted, easy CDN |
-| Background jobs | Trigger.dev v3 | Best Next.js background jobs, type-safe |
-| Browser automation | Stagehand (by Browserbase) | AI-native Playwright wrapper for form filling |
-| Observability | Langfuse | LLM call tracing, prompt versioning, cost tracking |
+| Forms | React Hook Form + Zod | Type-safe forms |
+| AI SDK | Anthropic SDK (direct) | One provider, simple billing |
+| LLM — extraction | claude-haiku-4-5 | Cheap, fast: scraping, classification, ghost detection |
+| LLM — writing | claude-sonnet-4-6 | Quality: CV, cover letter, custom answers |
+| Agent framework | LangGraph.js | Stateful multi-agent graph |
+| Embeddings | Voyage AI (voyage-3) | Best for document retrieval |
+| Vector DB | Pinecone Serverless | Production-grade managed search |
+| Document parsing | LlamaParse | Best PDF parsing for RAG |
+| Database | Supabase (PostgreSQL) | DB + Auth + Storage + Realtime |
+| ORM | Drizzle ORM | Type-safe, lightweight |
+| Auth | Supabase Auth | Native integration + RLS |
+| File storage | Supabase Storage | User-scoped, encrypted |
+| Payments | Stripe (one-time purchases) | Credit pack purchases |
+| Background jobs | Trigger.dev v3 | Scraping cron + job queues |
+| Browser automation | Python + Selenium | Separate microservice — builder proficient in it |
+| Automation stealth | undetected-chromedriver | Anti-detection, human behaviour mimicry |
+| Observability | Langfuse | LLM tracing, prompt versioning, cost tracking |
 | Error monitoring | Sentry | Production error tracking |
 | Testing | Vitest + Playwright | Unit + E2E |
-| Deployment | Vercel + Supabase cloud | Best-in-class Next.js deployment |
+| Deployment | Vercel (Next.js) + Railway (Python) | Best-in-class for each |
+
+---
+
+## Architecture: Two Services
+
+### Service 1 — Next.js App (TypeScript)
+All frontend, all API routes, all AI agents, all database logic.
+Deployed on Vercel.
+
+### Service 2 — Automation Microservice (Python + FastAPI)
+ONLY responsible for:
+- Selenium scraping of job listings (LinkedIn, Indeed, Greenhouse, Lever, Workday)
+- Selenium form filling and application submission
+- Stealth Engine logic (delays, human behaviour, health monitoring)
+
+Communicates with Service 1 via REST API.
+Deployed on Railway.
+
+---
+
+## Design System — Topaz Palette (LOCKED)
+
+```
+--hl-bg:             #F5FFFE   (page background — cool white)
+--hl-surface:        #E0F9FA   (card tints, tag backgrounds)
+--hl-surface-raised: #FFFFFF   (elevated cards, modals)
+--hl-border:         #B2EDEC   (default border)
+--hl-border-subtle:  #D4F5F5   (dividers)
+--hl-accent:         #00B8D9   (primary buttons, badges, active states)
+--hl-accent-hover:   #0097B2   (hover)
+--hl-accent-light:   #E0F9FA   (tint backgrounds)
+--hl-text-primary:   #0C1A1C   (headings, body)
+--hl-text-secondary: #5A9EA8   (labels, meta)
+--hl-text-tertiary:  #8ABCC4   (placeholders, timestamps)
+--hl-warning-bg:     #FFF5E0
+--hl-warning-text:   #A05E00
+--hl-warning-border: #FFDEA0
+```
+
+Logo mark: 32×32px square, bg #00B8D9, rounded-lg, "HL" font-extrabold white.
+Light mode default. Dark mode toggle available.
+
+---
+
+## Monetisation — Credit-Based "Job-Pack" Model
+
+Credits are purchased once. They never expire. 1 credit = 1 submitted application.
+AI generation (without submission) does not cost credits.
+
+| Plan | Price | Credits | Target User |
+|---|---|---|---|
+| Free Kick | $0 | 2 | Sceptical user testing quality |
+| The Interviewer | $15 | 20 | Active seeker, specific roles |
+| The Power Hunter | $35 | 60 | Aggressive seeker, competitive market |
+| The Career Pivot | $60 | 120 | Pivoting across multiple industries |
+
+### Credit Rules
+- 2 free credits granted on email verification (not just signup — prevents abuse)
+- Credits deducted ONLY on successful Selenium form submission (confirmed by the Python service)
+- If submission fails: no credit deducted, error logged, user notified
+- Credits stored in `user_credits` table with full transaction log
+- Stripe Checkout for all purchases (one-time payment, no subscription)
+
+### Landing Page Hook — "Resume Health Check"
+Free tool on the public landing page (no account required):
+- User pastes their CV text + a job description
+- Claude Haiku scores the match, identifies missing keywords, shows 3 improvement suggestions
+- CTA: "Apply with 1 credit and let HireLoop rewrite it for you"
+- This is the primary acquisition funnel. Build it in Phase 1.
+
+---
+
+## The Stealth Engine (Python Microservice)
+
+All platform limits are hardcoded — not user-configurable.
+These protect users from themselves.
+
+| Platform | Max/day | Min gap | Hours (job's local timezone) |
+|---|---|---|---|
+| LinkedIn | 3 | 60 min | 08:00–19:00 |
+| Indeed | 5 | 25 min | 08:00–20:00 |
+| Greenhouse | 8 | 10 min | Any |
+| Lever | 8 | 10 min | Any |
+| Workday | 6 | 15 min | Any |
+
+Human behaviour rules (all randomised):
+- Reads the job page for 30–90s before touching the form
+- Types at 120–180 WPM with random micro-pauses (not instant fill)
+- Randomises gap between applications by ±30% of minimum
+- Prefers Tuesday–Thursday when recruiters are most active
+- Random mouse movement before clicking submit
+
+Health monitoring:
+- CAPTCHA detected → pause platform for 24h, push notification to user
+- 2 failed submissions in a row → pause + flag for manual review
+- Unusual response pattern → back off for 6h, log incident
+
+---
+
+## Ghost Job Detection (auto-skip before any AI generation)
+
+Run by Claude Haiku. A job is flagged as ghost if 2+ signals match:
+
+1. Posted more than 60 days ago with no update
+2. Same job title posted 3+ times by same company in 30 days
+3. Job description is a near-duplicate of another active listing (>85% similarity)
+4. Company has a hiring freeze flag (sourced from layoffs.fyi or similar)
+5. "Easy Apply" on LinkedIn with 500+ applicants and posted >30 days ago
+
+Auto-skipped jobs are logged with reason. User can view skipped jobs and override.
+
+---
+
+## Interview Callback Tracking
+
+Stored in `applications` table: `interview_status` field.
+Values: `pending` | `rejected` | `interview_scheduled` | `offer` | `ghosted`
+
+User marks status manually via the dashboard (we cannot auto-detect this).
+
+Dashboard shows:
+- Total applications sent
+- Interview rate % (interviews ÷ total)
+- Breakdown by platform (which platform converts best)
+- Breakdown by match score band (do 80%+ matches actually get more interviews?)
+- 30-day trend chart
+
+This data becomes the product's proof of quality over time.
+
+---
+
+## Database Schema (Supabase + Drizzle)
+
+### Core tables
+
+```sql
+-- User credits
+user_credits (
+  id uuid primary key,
+  user_id uuid references auth.users unique,
+  balance integer default 2,
+  total_purchased integer default 0,
+  updated_at timestamptz
+)
+
+-- Credit transactions
+credit_transactions (
+  id uuid primary key,
+  user_id uuid references auth.users,
+  amount integer,              -- positive = purchase, negative = spend
+  type text,                   -- 'purchase' | 'spend' | 'refund' | 'signup_bonus'
+  application_id uuid,         -- null for purchases
+  stripe_payment_id text,      -- null for non-purchases
+  created_at timestamptz
+)
+
+-- User preferences (questionnaire)
+user_preferences (
+  id uuid primary key,
+  user_id uuid references auth.users unique,
+  target_roles text[],
+  target_locations text[],
+  seniority_level text,
+  industries text[],
+  exclude_companies text[],
+  tone_preference text,
+  always_emphasize text[],
+  never_mention text[],
+  salary_expectation text,
+  notice_period text,
+  work_authorization boolean,
+  requires_sponsorship boolean,
+  preferred_name text
+)
+
+-- Document chunks (RAG)
+document_chunks (
+  id uuid primary key,
+  user_id uuid references auth.users,
+  source_file text,
+  chunk_type text,
+  chunk_index integer,
+  content text,
+  word_count integer,
+  pinecone_id text unique,
+  file_type text,
+  uploaded_at timestamptz
+)
+
+-- Job listings (scraped)
+job_listings (
+  id uuid primary key,
+  platform text,
+  external_id text,
+  title text,
+  company text,
+  location text,
+  remote boolean,
+  salary_min integer,
+  salary_max integer,
+  description text,
+  application_url text,
+  posted_at timestamptz,
+  scraped_at timestamptz,
+  is_ghost boolean default false,
+  ghost_reason text,
+  applicant_count integer,
+  unique(platform, external_id)
+)
+
+-- Per-user job match scores
+user_job_scores (
+  id uuid primary key,
+  user_id uuid references auth.users,
+  job_id uuid references job_listings,
+  match_score integer,         -- 0-100
+  matched_skills text[],
+  missing_skills text[],
+  scored_at timestamptz,
+  unique(user_id, job_id)
+)
+
+-- Applications
+applications (
+  id uuid primary key,
+  user_id uuid references auth.users,
+  job_id uuid references job_listings,
+  tailored_cv jsonb,
+  cover_letter text,
+  qa_report jsonb,
+  match_score integer,
+  submitted_at timestamptz,
+  submission_status text,      -- 'pending' | 'submitted' | 'failed'
+  interview_status text,       -- 'pending' | 'rejected' | 'interview_scheduled' | 'offer' | 'ghosted'
+  credits_used integer default 1,
+  platform text,
+  notes text
+)
+```
 
 ---
 
 ## Project Structure
 
 ```
-src/
-├── app/
-│   ├── (auth)/
-│   │   ├── sign-in/page.tsx
-│   │   └── sign-up/page.tsx
-│   ├── (dashboard)/
-│   │   ├── layout.tsx
-│   │   ├── profile/             # Document upload + questionnaire
-│   │   │   └── page.tsx
-│   │   ├── jobs/                # Job queue
-│   │   │   ├── page.tsx
-│   │   │   └── [id]/
-│   │   │       └── page.tsx     # Generation + review screen
-│   │   └── history/             # Application log
-│   │       └── page.tsx
-│   └── api/
-│       ├── documents/
-│       │   └── route.ts         # Upload + trigger ingestion job
-│       ├── jobs/
-│       │   └── route.ts         # Analyse job posting
-│       ├── generate/
-│       │   └── route.ts         # Streaming generation endpoint
-│       ├── apply/
-│       │   └── route.ts         # Submit application
-│       └── webhooks/
-│           └── trigger/
-│               └── route.ts     # Trigger.dev webhook receiver
-├── components/
-│   ├── ui/                      # shadcn auto-generated, do not edit manually
-│   ├── upload/
-│   │   ├── dropzone.tsx
-│   │   └── file-status.tsx
-│   ├── questionnaire/
-│   │   ├── question-card.tsx
-│   │   └── progress-bar.tsx
-│   ├── generation/
-│   │   ├── agent-timeline.tsx   # Live agent progress (streaming)
-│   │   ├── cv-diff.tsx          # Side-by-side diff viewer
-│   │   └── stream-output.tsx    # Streaming text reveal
-│   └── applications/
-│       ├── application-card.tsx
-│       └── status-badge.tsx
-├── lib/
-│   ├── ai/
-│   │   ├── agents/
-│   │   │   ├── orchestrator.ts
-│   │   │   ├── job-analyst.ts
-│   │   │   ├── relevancy.ts
-│   │   │   ├── cv-writer.ts
-│   │   │   ├── cover-letter-writer.ts
-│   │   │   └── qa-checker.ts
-│   │   ├── prompts/             # Versioned prompt templates
-│   │   │   ├── job-analyst.v1.ts
-│   │   │   ├── cv-writer.v1.ts
-│   │   │   ├── cover-letter.v1.ts
-│   │   │   └── qa-checker.v1.ts
-│   │   └── tools/               # Claude tool definitions (typed)
-│   ├── rag/
-│   │   ├── ingestion/
-│   │   │   ├── parse.ts         # LlamaParse wrapper
-│   │   │   └── extract.ts       # GitHub + LinkedIn extractors
-│   │   ├── chunking/
-│   │   │   └── strategies.ts    # Section-aware chunking per file type
-│   │   ├── embeddings/
-│   │   │   └── voyage.ts        # Voyage AI embedding wrapper
-│   │   └── retrieval/
-│   │       ├── search.ts        # Pinecone similarity search
-│   │       └── rerank.ts        # Cohere reranker (post-retrieval)
-│   ├── browser/
-│   │   ├── apply.ts             # Stagehand application automation
-│   │   └── extract.ts           # Job posting scraper
-│   ├── db/
-│   │   ├── schema.ts            # Drizzle schema
-│   │   └── queries/
-│   │       ├── documents.ts
-│   │       ├── applications.ts
-│   │       └── users.ts
-│   ├── queue/
-│   │   ├── ingest-document.ts   # Trigger.dev: parse + chunk + embed
-│   │   ├── generate-application.ts
-│   │   └── submit-application.ts
-│   └── validation/
-│       └── schemas.ts           # All Zod schemas
-├── hooks/
-│   ├── use-stream.ts            # Vercel AI SDK streaming hook
-│   ├── use-upload.ts
-│   └── use-application.ts
-├── stores/
-│   ├── user-profile.store.ts    # Questionnaire answers + preferences
-│   └── generation.store.ts      # Active generation state
-└── types/
-    ├── agents.ts
-    ├── documents.ts
-    └── applications.ts
+hireloop/
+├── src/                          # Next.js app (TypeScript)
+│   ├── app/
+│   │   ├── (marketing)/          # Public pages
+│   │   │   ├── page.tsx          # Landing page + Resume Health Check
+│   │   │   ├── pricing/
+│   │   │   └── sign-in / sign-up/
+│   │   ├── (dashboard)/          # Protected app
+│   │   │   ├── feed/             # Job Feed
+│   │   │   ├── jobs/[id]/        # Generation + review
+│   │   │   ├── applications/     # History + callback tracking
+│   │   │   ├── profile/          # Docs + questionnaire
+│   │   │   └── settings/         # Credits, account
+│   │   └── api/
+│   │       ├── documents/
+│   │       ├── jobs/
+│   │       ├── generate/         # Streaming SSE
+│   │       ├── apply/            # Calls Python service
+│   │       ├── credits/
+│   │       ├── stripe/
+│   │       └── webhooks/
+│   ├── lib/
+│   │   ├── ai/agents/            # 5 LangGraph agents
+│   │   ├── ai/prompts/           # Versioned prompt templates
+│   │   ├── rag/                  # Voyage + Pinecone pipeline
+│   │   ├── db/                   # Drizzle schema + queries
+│   │   ├── stripe/               # Payment helpers
+│   │   └── validation/           # Zod schemas
+│   └── components/
+│       ├── ui/                   # shadcn
+│       ├── feed/                 # Job cards, filters
+│       ├── generation/           # Agent timeline, diff, stream
+│       ├── applications/         # History, callback tracker
+│       └── upload/               # File dropzone
+│
+├── automation/                   # Python microservice
+│   ├── main.py                   # FastAPI app
+│   ├── scrapers/
+│   │   ├── linkedin.py
+│   │   ├── indeed.py
+│   │   ├── greenhouse.py
+│   │   ├── lever.py
+│   │   └── workday.py
+│   ├── stealth/
+│   │   ├── engine.py             # Rate limits, delays, health monitoring
+│   │   └── browser.py            # undetected-chromedriver setup
+│   ├── filler/
+│   │   └── apply.py              # Form filling logic
+│   └── requirements.txt
+│
+├── CLAUDE.md                     # This file
+├── AGENTS.md                     # Agent architecture
+└── .cursor/rules/                # All .mdc files
 ```
 
 ---
 
-## Environment Variables Required
+## Environment Variables
 
 ```bash
-# AI
+# Anthropic (both models, one key)
 ANTHROPIC_API_KEY=
-VOYAGE_API_KEY=
-LANGFUSE_PUBLIC_KEY=
-LANGFUSE_SECRET_KEY=
-LANGFUSE_HOST=
 
-# Vector DB
+# RAG
+VOYAGE_API_KEY=
 PINECONE_API_KEY=
 PINECONE_INDEX=hireloop-docs
 
-# Document Parsing
+# Document parsing
 LLAMA_CLOUD_API_KEY=
 
 # Database + Auth + Storage
@@ -176,69 +381,46 @@ NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 
-# Background Jobs
+# Payments
+STRIPE_SECRET_KEY=
+STRIPE_WEBHOOK_SECRET=
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
+
+# Background jobs
 TRIGGER_SECRET_KEY=
 
-# Browser Automation
-BROWSERBASE_API_KEY=
-BROWSERBASE_PROJECT_ID=
-
-# Reranking (optional, improves RAG)
-COHERE_API_KEY=
-
-# Monitoring
+# Observability
+LANGFUSE_PUBLIC_KEY=
+LANGFUSE_SECRET_KEY=
+LANGFUSE_HOST=
 SENTRY_DSN=
+
+# Python microservice URL
+AUTOMATION_SERVICE_URL=http://localhost:8000
+AUTOMATION_API_KEY=           # Shared secret between Next.js and Python service
 ```
 
 ---
 
-## Critical Rules for Claude Code
+## Build Phases
 
-### Code Quality
-- All code in TypeScript strict mode — no `any`, no `as unknown`
-- Every function must have explicit return types
-- Use Zod for all runtime validation — never trust unvalidated external data
-- Error boundaries on every major UI section
-- All async functions must handle errors — never unhandled promise rejections
-
-### AI Calls
-- All LLM calls go through `src/lib/ai/` — never call Anthropic SDK directly from routes
-- Always trace calls via Langfuse: `const trace = langfuse.trace({ name: 'agent-name' })`
-- Log every token count and prompt version used
-- Default model: `claude-sonnet-4-20250514` — do not change without a comment
-- Always stream responses — never wait for full completion before showing UI
-
-### Database
-- Every Supabase query uses the server client from `@/lib/db`
-- Row Level Security is enabled on all tables — never use `service_role` key in client-side code
-- All schema changes go through Drizzle migrations — never ALTER TABLE manually
-
-### Security
-- No secrets in code, `.env.local` only
-- Sanitize all extracted document text before injecting into prompts
-- All API routes require Supabase auth session verification
-- RLS policies: users can only read/write their own rows
-
-### Testing
-- Every new agent function needs a Vitest unit test
-- Every new API route needs at least one integration test
-- Playwright E2E covers the full generation flow
-
-### Working Style
-- Work through tasks autonomously — only surface blockers, not progress updates
-- After each major task: run `pnpm typecheck` and `pnpm lint` — fix all errors before moving on
-- Never leave TODO comments — either implement it or create a GitHub issue comment
-- Commit message format: `feat(scope): description` / `fix(scope): description`
+- [ ] Phase 1: Scaffold + auth + DB schema + Topaz design tokens + Resume Health Check on landing page
+- [ ] Phase 2: Document ingestion pipeline (upload → LlamaParse → chunk → embed → Pinecone)
+- [ ] Phase 3: Python scraping service (all 5 platforms + ghost detection + Stealth Engine)
+- [ ] Phase 4: Job Feed UI (cards, filters, match scores, auto-apply toggle)
+- [ ] Phase 5: AI generation pipeline (5 agents, LangGraph, streaming, diff view)
+- [ ] Phase 6: Selenium form filling + credit decrement on submission
+- [ ] Phase 7: Stripe credit packs + dashboard (interview tracking, callback rate)
+- [ ] Phase 8: Production hardening (rate limiting, Langfuse, Sentry, tests, deploy)
 
 ---
 
-## Current Phase
+## Non-Negotiables
 
-> Update this section at the start of each session to reflect what's done.
-
-- [ ] Phase 1: Project scaffold + auth + DB schema
-- [ ] Phase 2: Document ingestion pipeline (upload → parse → chunk → embed)
-- [ ] Phase 3: Multi-agent generation pipeline
-- [ ] Phase 4: Application auto-fill (Stagehand)
-- [ ] Phase 5: UI polish + streaming generation view
-- [ ] Phase 6: Observability + error handling + tests
+1. TypeScript strict everywhere — no `any`
+2. All LLM calls traced via Langfuse
+3. Credits deducted ONLY on confirmed submission from Python service
+4. Stealth Engine rate limits are hardcoded — never user-configurable
+5. Ghost jobs auto-skipped — no AI generation wasted on them
+6. Never submit without user confirmation (manual mode)
+7. All user documents are PII — RLS on all tables, never logged
