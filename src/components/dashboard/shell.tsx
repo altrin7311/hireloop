@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LogoMark } from "@/components/brand/logo-mark";
@@ -18,14 +18,37 @@ const NAV_LINKS = [
 export function DashboardShell({
   email,
   initials,
+  initialAutoApply = false,
   children,
 }: {
   email: string;
   initials: string;
+  initialAutoApply?: boolean;
   children: React.ReactNode;
 }): React.JSX.Element {
   const pathname = usePathname();
-  const [autoApply, setAutoApply] = useState(false);
+  const [autoApply, setAutoApply] = useState(initialAutoApply);
+  const [error, setError] = useState<string | null>(null);
+  const [, startTransition] = useTransition();
+
+  function handleToggle(next: boolean): void {
+    const previous = autoApply;
+    setAutoApply(next);
+    setError(null);
+    startTransition(async () => {
+      try {
+        const resp = await fetch("/api/preferences", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ auto_apply: next }),
+        });
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      } catch (err) {
+        setAutoApply(previous);
+        setError(err instanceof Error ? err.message : "Toggle failed");
+      }
+    });
+  }
 
   return (
     <div
@@ -68,7 +91,7 @@ export function DashboardShell({
           <div className="flex items-center gap-5">
             <label className="flex items-center gap-2 text-sm">
               <span className="text-[#5A9EA8]">Auto Apply</span>
-              <Switch checked={autoApply} onCheckedChange={setAutoApply} />
+              <Switch checked={autoApply} onCheckedChange={handleToggle} />
             </label>
             <Avatar>
               <AvatarFallback title={email}>{initials}</AvatarFallback>
@@ -76,6 +99,34 @@ export function DashboardShell({
           </div>
         </div>
       </header>
+
+      {autoApply ? (
+        <div
+          className="border-b"
+          style={{
+            background: "#FFF5E0",
+            borderColor: "#FFDEA0",
+            color: "#A05E00",
+          }}
+        >
+          <div className="mx-auto max-w-7xl px-6 py-2 text-sm">
+            <strong className="font-semibold">Auto Apply is active.</strong> HireLoop will apply to
+            jobs above your match threshold.
+          </div>
+        </div>
+      ) : null}
+
+      {error ? (
+        <div
+          className="border-b"
+          style={{ background: "#FFF5E0", borderColor: "#FFDEA0", color: "#A05E00" }}
+        >
+          <div className="mx-auto max-w-7xl px-6 py-1.5 text-xs">
+            Preference sync failed: {error}
+          </div>
+        </div>
+      ) : null}
+
       <main className="mx-auto max-w-7xl px-6 py-8">{children}</main>
     </div>
   );

@@ -6,6 +6,8 @@ import { embedMany } from "ai";
 export const EMBEDDING_MODEL = "gemini-embedding-001";
 export const EMBEDDING_DIMENSIONS = 768;
 const BATCH_SIZE = 64;
+// Free tier: 100 requests/minute. 700ms gap = ~85 RPM ceiling, safe headroom.
+const BATCH_GAP_MS = 700;
 
 type Task = "RETRIEVAL_DOCUMENT" | "RETRIEVAL_QUERY";
 
@@ -45,6 +47,11 @@ export async function embedTexts(
     }
 
     out.push(...embeddings);
+
+    // Throttle to stay under Google's 100 RPM free-tier embedding limit.
+    if (batchNumber < totalBatches) {
+      await new Promise((r) => setTimeout(r, BATCH_GAP_MS));
+    }
   }
 
   return out;
