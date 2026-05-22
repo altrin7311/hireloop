@@ -1,0 +1,54 @@
+- generic [active] [ref=e1]:
+  - button "Open Next.js Dev Tools" [ref=e28] [cursor=pointer]:
+    - img [ref=e29]
+  - alert [ref=e32]: HireLoop — 5 perfect applications beat 500 generic ones
+  - generic [ref=e33]:
+    - banner [ref=e34]:
+      - generic [ref=e35]:
+        - generic [ref=e36]:
+          - link "HireLoop HireLoop" [ref=e37] [cursor=pointer]:
+            - /url: /dashboard/feed
+            - generic "HireLoop" [ref=e38]: HL
+            - generic [ref=e39]: HireLoop
+          - navigation [ref=e40]:
+            - link "Feed" [ref=e41] [cursor=pointer]:
+              - /url: /dashboard/feed
+            - link "Applications" [ref=e42] [cursor=pointer]:
+              - /url: /dashboard/applications
+            - link "Profile" [ref=e43] [cursor=pointer]:
+              - /url: /dashboard/profile
+            - link "Settings" [ref=e44] [cursor=pointer]:
+              - /url: /dashboard/settings
+        - generic [ref=e45]:
+          - generic [ref=e46]:
+            - generic [ref=e47]: Auto Apply
+            - switch "Auto Apply" [ref=e48] [cursor=pointer]
+          - generic "djajc@gmail.com" [ref=e50]: DJ
+    - main [ref=e51]:
+      - generic [ref=e841]:
+        - generic [ref=e843]:
+          - heading "Analytics Data Engineer" [level=1] [ref=e844]
+          - paragraph [ref=e845]: anthropic · Live generation
+        - generic [ref=e846]:
+          - complementary [ref=e847]:
+            - heading "Agent timeline" [level=2] [ref=e848]
+            - list [ref=e849]:
+              - listitem [ref=e850]:
+                - generic [ref=e856]: Analysing job
+              - listitem [ref=e857]:
+                - generic [ref=e863]: Retrieving your experience
+              - listitem [ref=e864]:
+                - generic [ref=e870]: Writing CV
+              - listitem [ref=e871]:
+                - generic [ref=e877]: Writing cover letter
+              - listitem [ref=e878]:
+                - generic [ref=e884]: QA check
+          - generic [ref=e885]:
+            - generic [ref=e886]:
+              - generic [ref=e887]:
+                - button "CV" [ref=e888]
+                - button "Cover Letter" [ref=e889]
+              - button "Edit" [disabled]
+            - generic [ref=e890]: Waiting for CV…
+            - generic [ref=e891]:
+              - button "Confirm & Apply" [disabled]

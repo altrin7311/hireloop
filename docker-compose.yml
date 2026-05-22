@@ -1,0 +1,27 @@
+services:
+  nextjs:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.local
+    environment:
+      - NODE_ENV=production
+      - AUTOMATION_SERVICE_URL=http://python:8000
+    depends_on:
+      - python
+    restart: unless-stopped
+
+  python:
+    build:
+      context: ./automation
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    env_file:
+      - automation/.env
+    environment:
+      - HEADLESS=true
+    restart: unless-stopped

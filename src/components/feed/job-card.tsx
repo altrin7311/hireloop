@@ -1,5 +1,7 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+
 import { Button } from "@/components/ui/button";
 
 export type FeedJob = {
@@ -63,10 +65,19 @@ export function JobCard({
   onSave?: (job: FeedJob) => void;
   onSkip?: (job: FeedJob) => void;
 }): React.JSX.Element {
+  const router = useRouter();
   const score = job.matchScore;
   const salary = formatSalary(job.salaryMin, job.salaryMax);
   const platformLabel = PLATFORM_LABELS[job.platform] ?? job.platform;
   const missing = job.missingSkills ?? [];
+
+  const handleApplyClick = (): void => {
+    if (onApply) {
+      onApply(job);
+      return;
+    }
+    router.push(`/dashboard/jobs/${job.id}`);
+  };
 
   return (
     <article
@@ -151,7 +162,7 @@ export function JobCard({
           ) : null}
 
           <div className="mt-4 flex items-center gap-2">
-            <Button variant="primary" size="sm" onClick={() => onApply?.(job)}>
+            <Button variant="primary" size="sm" onClick={handleApplyClick}>
               Review &amp; Apply
             </Button>
             <Button variant="secondary" size="sm" onClick={() => onSave?.(job)}>

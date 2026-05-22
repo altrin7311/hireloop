@@ -95,25 +95,36 @@ failed submissions are free.
 
 ---
 
+## Running with Docker
+
+Single command spins up both services (Next.js on 3000, Python automation on 8000):
+
+```bash
+docker compose up --build
+```
+
+Requires `.env.local` (Next.js) and `automation/.env` (Python) at repo paths —
+neither is baked into the image; both are passed at runtime via `env_file`.
+
 ## Running locally
 
-### Next.js
+### Next.js (Terminal 1)
 
 ```bash
 pnpm install
 cp .env.example .env.local
-# fill in Supabase keys, Google embedding key, AUTOMATION_API_KEY
+# fill in Supabase keys, Google embedding key, GROQ_API_KEY, AUTOMATION_API_KEY
 pnpm dev
 ```
 
-### Python automation service
+### Python automation service (Terminal 2)
 
 ```bash
 cd automation
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env
-uvicorn automation.main:app --port 8000 --reload
+uvicorn main:app --port 8000 --reload
 ```
 
 See [`automation/README.md`](./automation/README.md) for endpoint details and

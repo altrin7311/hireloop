@@ -345,13 +345,7 @@ export function FeedView({
       ) : (
         <div className="space-y-3">
           {filteredJobs.map((job) => (
-            <JobCard
-              key={job.id}
-              job={toFeedJob(job)}
-              onApply={() => {
-                window.open(job.applicationUrl, "_blank", "noopener,noreferrer");
-              }}
-            />
+            <JobCard key={job.id} job={toFeedJob(job)} />
           ))}
         </div>
       )}

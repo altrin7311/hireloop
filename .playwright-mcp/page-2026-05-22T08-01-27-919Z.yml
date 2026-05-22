@@ -1,0 +1,183 @@
+- generic [active] [ref=e1]:
+  - button "Open Next.js Dev Tools" [ref=e28] [cursor=pointer]:
+    - img [ref=e29]
+  - alert [ref=e32]: HireLoop — 5 perfect applications beat 500 generic ones
+  - generic [ref=e33]:
+    - banner [ref=e34]:
+      - generic [ref=e35]:
+        - generic [ref=e36]:
+          - link "HireLoop HireLoop" [ref=e37] [cursor=pointer]:
+            - /url: /dashboard/feed
+            - generic "HireLoop" [ref=e38]: HL
+            - generic [ref=e39]: HireLoop
+          - navigation [ref=e40]:
+            - link "Feed" [ref=e41] [cursor=pointer]:
+              - /url: /dashboard/feed
+            - link "Applications" [ref=e42] [cursor=pointer]:
+              - /url: /dashboard/applications
+            - link "Profile" [ref=e43] [cursor=pointer]:
+              - /url: /dashboard/profile
+            - link "Settings" [ref=e44] [cursor=pointer]:
+              - /url: /dashboard/settings
+        - generic [ref=e45]:
+          - generic [ref=e46]:
+            - generic [ref=e47]: Auto Apply
+            - switch "Auto Apply" [ref=e48] [cursor=pointer]
+          - generic "djajc@gmail.com" [ref=e50]: DJ
+    - main [ref=e51]:
+      - generic [ref=e841]:
+        - generic [ref=e842]:
+          - generic [ref=e843]:
+            - heading "Analytics Data Engineer" [level=1] [ref=e844]
+            - paragraph [ref=e845]: anthropic · Live generation
+          - generic [ref=e902]: Passed
+        - generic [ref=e846]:
+          - complementary [ref=e847]:
+            - heading "Agent timeline" [level=2] [ref=e848]
+            - list [ref=e849]:
+              - listitem [ref=e850]:
+                - img [ref=e892]
+                - generic [ref=e855]:
+                  - generic [ref=e856]: Analysing job
+                  - generic [ref=e894]: 2.6s
+              - listitem [ref=e857]:
+                - img [ref=e895]
+                - generic [ref=e862]:
+                  - generic [ref=e863]: Retrieving your experience
+                  - generic [ref=e897]: 1.8s
+              - listitem [ref=e864]:
+                - img [ref=e903]
+                - generic [ref=e869]:
+                  - generic [ref=e870]: Writing CV
+                  - generic [ref=e905]: 2.5s
+              - listitem [ref=e871]:
+                - img [ref=e906]
+                - generic [ref=e876]:
+                  - generic [ref=e877]: Writing cover letter
+                  - generic [ref=e908]: 2.4s
+              - listitem [ref=e878]:
+                - img [ref=e909]
+                - generic [ref=e883]:
+                  - generic [ref=e884]: QA check
+                  - generic [ref=e911]: 10.9s
+            - generic [ref=e912]:
+              - generic [ref=e913]: Quality
+              - generic [ref=e914]: 100/100
+          - generic [ref=e885]:
+            - generic [ref=e886]:
+              - generic [ref=e887]:
+                - button "CV" [ref=e888]
+                - button "Cover Letter" [ref=e889]
+              - button "Edit" [ref=e915]
+            - generic [ref=e890]:
+              - generic [ref=e916]:
+                - heading "Summary" [level=3] [ref=e917]
+                - paragraph [ref=e918]: Highly motivated data analytics intern with experience in building and maintaining Power BI and Excel dashboards, as well as developing automated Python-based data pipelines. Skilled in Python, SQL, Power BI, and predictive modeling. Seeking to apply data-driven techniques to solve complex problems and contribute to innovative AI solutions. Experienced in creating data reporting and dashboards, with a strong foundation in data analytics and machine learning.
+              - generic [ref=e919]:
+                - heading "Experience" [level=3] [ref=e920]
+                - list [ref=e921]:
+                  - listitem [ref=e922]:
+                    - generic [ref=e923]:
+                      - text: Data Analytics Intern
+                      - generic [ref=e924]: — Landmark Group · Jan 2026 - Present
+                    - list [ref=e925]:
+                      - listitem [ref=e926]: Built and maintained Power BI and Excel dashboards to monitor Supply Chain KPIs (SLA) across multiple territories, enabling data-driven operational decisions
+                      - listitem [ref=e927]: Developed automated Python-based data pipelines to process and structure 1M+ operational records, improving reporting efficiency and data accuracy
+                      - listitem [ref=e928]: Created advanced DAX measures and KPI logic to ensure accurate performance tracking and standardized reporting across distribution centers
+                      - listitem [ref=e929]: Leveraged AI-assisted analytics and automation techniques to identify performance patterns, support predictive insights, and enhance supply chain reporting processes
+              - generic [ref=e930]:
+                - heading "Skills" [level=3] [ref=e931]
+                - generic [ref=e932]:
+                  - generic [ref=e933]: "Featured: Python, SQL, Power BI, Data Analytics, ETL, Data Cleaning & Dashboarding"
+                  - generic [ref=e934]: "Additional: Java, C, C++, Excel, Data Modeling, Machine Learning, TensorFlow, PyTorch, Scikit-learn, Flask, Streamlit, OpenCV, NumPy, Pandas, Matplotlib, LangChain, Pygame, Uvicorn, BeautifulSoup, Selenium"
+              - generic [ref=e935]:
+                - heading "Projects" [level=3] [ref=e936]
+                - list [ref=e937]:
+                  - listitem [ref=e938]:
+                    - generic [ref=e939]: Customer Purchase Behavior & Product Recommendation
+                    - generic [ref=e940]: Conducted RFM-based customer segmentation and sales trend analysis. Built product recommendation model using market basket analysis.
+                    - generic [ref=e941]: Python, SQL, Power BI
+                  - listitem [ref=e942]:
+                    - generic [ref=e943]: fMRI Brain Signal Reconstruction
+                    - generic [ref=e944]: Developed deep learning model to reconstruct images from fMRI brain signals. Produced high-quality outputs validated through advanced similarity metrics.
+                    - generic [ref=e945]: Python, TensorFlow, PyTorch
+                  - listitem [ref=e946]:
+                    - generic [ref=e947]: Smart Property Insights – AI-Enhanced Real Estate Dashboard
+                    - generic [ref=e948]: Built an AI-driven dashboard for real estate insights using LangChain and FastAPI. Automated data scraping, preprocessing, and NLP-based insight generation.
+                    - generic [ref=e949]: Python, LangChain, FastAPI
+                  - listitem [ref=e950]:
+                    - generic [ref=e951]: Executive Resource Management Dashboard
+                    - generic [ref=e952]: Developed an AI dashboard to digitize workforce planning using Python and stats. Automated resource forecasting with data-driven insights.
+                    - generic [ref=e953]: Python, Stats
+            - button "Confirm & Apply" [ref=e954]
+        - generic [ref=e955]:
+          - generic [ref=e956]:
+            - heading "Diff vs your uploaded experience" [level=2] [ref=e957]
+            - button "Hide changes" [ref=e958]
+          - generic [ref=e959]:
+            - generic [ref=e960]:
+              - generic [ref=e961]: Original
+              - generic [ref=e962]: "[Altrin Titus - CV.pdf / cv] Bachelor of Engineering in Computer Science BITS Pilani Dubai Campus Sep 2022 - Sep 2026 ALTRIN TITUS Computer Science undergraduate passionate about data analytics, machine learning, and artificial intelligence. Skilled in Python, SQL, Power BI, and predictive modeling, with hands-on experience in building ML models and analyzing real-world datasets. Seeking opportunities to apply data- driven techniques to solve complex problems and contribute to innovative AI solutions. OBJECTIVE EDUCATION EXPERIENCE GoBlue International Role: SEO Intern Jul 2024 - Aug 2024 Led SEO team to improve site content and rankings. Conducted data-driven reporting and keyword analysis. Hashgate Jun 2024 - Jul 2024 Led Shopify-based e-commerce site development for tech products. Customized themes, payment gateways, and managed workflows. Role: Shopify E-Commerce Development Intern Lab of Future Role: Software Engineer Trainer Intern Developed embedded systems and Python-based software solutions. Conducted hands-on training sessions in programming and technology. Jul 2025 - Aug 2025 www.linkedin.com/in/Altrin-Titus +971 52 426 4225 https://github.com/altrin7311 altrintitus@gmail.com Al Nahda, Sharjah Landmark Group Role: Data Analytics Intern Built and maintained Power BI and Excel dashboards to monitor Supply Chain KPIs (SLA) across multiple territories, enabling data-driven operational decisions. Developed automated Python-based data pipelines to process and structure 1M+ operational records, improving reporting efficiency and data accuracy. Created advanced DAX measures and KPI logic to ensure accurate performance tracking and standardized reporting across distribution centers. Leveraged AI-assisted analytics and automation techniques to identify performance patterns, support predictive insights, and enhance supply chain reporting processes. Jan 2026 - Present Machine Learning Specialization – Andrew Ng Google Advance Data Analytics Professional Certificate – Google CERTIFICATIONS Languages : Python, Java, C, C++, SQL Technical Skills : PowerBI, Excel, Data Cleaning & Dashboarding, Data Analytics, ETL, EDA Frameworks & Libraries: TensorFlow, PyTorch, Scikit-learn, Flask, Streamlit, OpenCV, NumPy, Pandas, Matplotlib, LangChain, Pygame, Uvicorn, BeautifulSoup, Selenium Awards/Activities: Professional Assistantship in BITS, 2×Gold in Chess, Bits Tech Fest marketing executive, Al Noor Volunteering, Kenken Volunteering. Hobbies: Running, Movies, Books, Trekking, Fishing, Gym, Chess. ADDITIONAL INFORMATION Customer Purchase Behavior & Product Recommendation Conducted RFM-based customer segmentation and sales trend analysis. Built product recommendation model using market basket analysis. fMRI Brain Signal Reconstruction (Under Prof. Kajal Kansal) Developed deep learning model to reconstruct images from fMRI brain signals. Produced high-quality outputs validated through advanced similarity metrics. Smart Property Insights – AI-Enhanced Real Estate Dashboard Built an AI-driven dashboard for real estate insights using LangChain and FastAPI. Automated data scraping, preprocessing, and NLP-based insight generation. Executive Resource Management Dashboard (Novo Nordisk Hackathon) • Developed an AI dashboard to digitize workforce planning using Python and stats. • Automated resource forecasting with data-driven insights. PROJECTS *More on GitHub [Altrin Titus - CV.pdf / cv] Bachelor of Engineering in Computer Science BITS Pilani Dubai Campus Sep 2022 - Sep 2026 ALTRIN TITUS Computer Science undergraduate passionate about data analytics, machine learning, and artificial intelligence. Skilled in Python, SQL, Power BI, and predictive modeling, with hands-on experience in building ML models and analyzing real-world datasets. Seeking opportunities to apply data- driven techniques to solve complex problems and contribute to innovative AI solutions. OBJECTIVE EDUCATION EXPERIENCE GoBlue International Role: SEO Intern Jul 2024 - Aug 2024 Led SEO team to improve site content and rankings. Conducted data-driven reporting and keyword analysis. Hashgate Jun 2024 - Jul 2024 Led Shopify-based e-commerce site development for tech products. Customized themes, payment gateways, and managed workflows. Role: Shopify E-Commerce Development Intern Lab of Future Role: Software Engineer Trainer Intern Developed embedded systems and Python-based software solutions. Conducted hands-on training sessions in programming and technology. Jul 2025 - Aug 2025 www.linkedin.com/in/Altrin-Titus +971 52 426 4225 https://github.com/altrin7311 altrintitus@gmail.com Al Nahda, Sharjah Landmark Group Role: Data Analytics Intern Built and maintained Power BI and Excel dashboards to monitor Supply Chain KPIs (SLA) across multiple territories, enabling data-driven operational decisions. Developed automated Python-based data pipelines to process and structure 1M+ operational records, improving reporting efficiency and data accuracy. Created advanced DAX measures and KPI logic to ensure accurate performance tracking and standardized reporting across distribution centers. Leveraged AI-assisted analytics and automation techniques to identify performance patterns, support predictive insights, and enhance supply chain reporting processes. Jan 2026 - Present Machine Learning Specialization – Andrew Ng Google Advance Data Analytics Professional Certificate – Google CERTIFICATIONS Languages : Python, Java, C, C++, SQL Technical Skills : PowerBI, Excel, Data Cleaning & Dashboarding, Data Analytics, ETL, EDA Frameworks & Libraries: TensorFlow, PyTorch, Scikit-learn, Flask, Streamlit, OpenCV, NumPy, Pandas, Matplotlib, LangChain, Pygame, Uvicorn, BeautifulSoup, Selenium Awards/Activities: Professional Assistantship in BITS, 2×Gold in Chess, Bits Tech Fest marketing executive, Al Noor Volunteering, Kenken Volunteering. Hobbies: Running, Movies, Books, Trekking, Fishing, Gym, Chess. ADDITIONAL INFORMATION Customer Purchase Behavior & Product Recommendation Conducted RFM-based customer segmentation and sales trend analysis. Built product recommendation model using market basket analysis. fMRI Brain Signal Reconstruction (Under Prof. Kajal Kansal) Developed deep learning model to reconstruct images from fMRI brain signals. Produced high-quality outputs validated through advanced similarity metrics. Smart Property Insights – AI-Enhanced Real Estate Dashboard Built an AI-driven dashboard for real estate insights using LangChain and FastAPI. Automated data scraping, preprocessing, and NLP-based insight generation. Executive Resource Management Dashboard (Novo Nordisk Hackathon) • Developed an AI dashboard to digitize workforce planning using Python and stats. • Automated resource forecasting with data-driven insights. PROJECTS *More on GitHub [Altrin Titus - CV.pdf / cv] Bachelor of Engineering in Computer Science BITS Pilani Dubai Campus Sep 2022 - Sep 2026 ALTRIN TITUS Computer Science undergraduate passionate about data analytics, machine learning, and artificial intelligence. Skilled in Python, SQL, Power BI, and predictive modeling, with hands-on experience in building ML models and analyzing real-world datasets. Seeking opportunities to apply data- driven techniques to solve complex problems and contribute to innovative AI solutions. OBJECTIVE EDUCATION EXPERIENCE GoBlue International Role: SEO Intern Jul 2024 - Aug 2024 Led SEO team to improve site content and rankings. Conducted data-driven reporting and keyword analysis. Hashgate Jun 2024 - Jul 2024 Led Shopify-based e-commerce site development for tech products. Customized themes, payment gateways, and managed workflows. Role: Shopify E-Commerce Development Intern Lab of Future Role: Software Engineer Trainer Intern Developed embedded systems and Python-based software solutions. Conducted hands-on training sessions in programming and technology. Jul 2025 - Aug 2025 www.linkedin.com/in/Altrin-Titus +971 52 426 4225 https://github.com/altrin7311 altrintitus@gmail.com Al Nahda, Sharjah Landmark Group Role: Data Analytics Intern Built and maintained Power BI and Excel dashboards to monitor Supply Chain KPIs (SLA) across multiple territories, enabling data-driven operational decisions. Developed automated Python-based data pipelines to process and structure 1M+ operational records, improving reporting efficiency and data accuracy. Created advanced DAX measures and KPI logic to ensure accurate performance tracking and standardized reporting across distribution centers. Leveraged AI-assisted analytics and automation techniques to identify performance patterns, support predictive insights, and enhance supply chain reporting processes. Jan 2026 - Present Machine Learning Specialization – Andrew Ng Google Advance Data Analytics Professional Certificate – Google CERTIFICATIONS Languages : Python, Java, C, C++, SQL Technical Skills : PowerBI, Excel, Data Cleaning & Dashboarding, Data Analytics, ETL, EDA Frameworks & Libraries: TensorFlow, PyTorch, Scikit-learn, Flask, Streamlit, OpenCV, NumPy, Pandas, Matplotlib, LangChain, Pygame, Uvicorn, BeautifulSoup, Selenium Awards/Activities: Professional Assistantship in BITS, 2×Gold in Chess, Bits Tech Fest marketing executive, Al Noor Volunteering, Kenken Volunteering. Hobbies: Running, Movies, Books, Trekking, Fishing, Gym, Chess. ADDITIONAL INFORMATION Customer Purchase Behavior & Product Recommendation Conducted RFM-based customer segmentation and sales trend analysis. Built product recommendation model using market basket analysis. fMRI Brain Signal Reconstruction (Under Prof. Kajal Kansal) Developed deep learning model to reconstruct images from fMRI brain signals. Produced high-quality outputs validated through advanced similarity metrics. Smart Property Insights – AI-Enhanced Real Estate Dashboard Built an AI-driven dashboard for real estate insights using LangChain and FastAPI. Automated data scraping, preprocessing, and NLP-based insight generation. Executive Resource Management Dashboard (Novo Nordisk Hackathon) • Developed an AI dashboard to digitize workforce planning using Python and stats. • Automated resource forecasting with data-driven insights. PROJECTS *More on GitHub [Altrin Titus - CV.pdf / cv] Bachelor of Engineering in Computer Science BITS Pilani Dubai Campus Sep 2022 - Sep 2026 ALTRIN TITUS Computer Science undergraduate passionate about data analytics, machine learning, and artificial intelligence. Skilled in Python, SQL, Power BI, and predictive modeling, with hands-on experience in building ML models and analyzing real-world datasets. Seeking opportunities to apply data- driven techniques to solve complex problems and contribute to innovative AI solutions. OBJECTIVE EDUCATION EXPERIENCE GoBlue International Role: SEO Intern Jul 2024 - Aug 2024 Led SEO team to improve site content and rankings. Conducted data-driven reporting and keyword analysis. Hashgate Jun 2024 - Jul 2024 Led Shopify-based e-commerce site development for tech products. Customized themes, payment gateways, and managed workflows. Role: Shopify E-Commerce Development Intern Lab of Future Role: Software Engineer Trainer Intern Developed embedded systems and Python-based software solutions. Conducted hands-on training sessions in programming and technology. Jul 2025 - Aug 2025 www.linkedin.com/in/Altrin-Titus +971 52 426 4225 https://github.com/altrin7311 altrintitus@gmail.com Al Nahda, Sharjah Landmark Group Role: Data Analytics Intern Built and maintained Power BI and Excel dashboards to monitor Supply Chain KPIs (SLA) across multiple territories, enabling data-driven operational decisions. Developed automated Python-based data pipelines to process and structure 1M+ operational records, improving reporting efficiency and data accuracy. Created advanced DAX measures and KPI logic to ensure accurate performance tracking and standardized reporting across distribution centers. Leveraged AI-assisted analytics and automation techniques to identify performance patterns, support predictive insights, and enhance supply chain reporting processes. Jan 2026 - Present Machine Learning Specialization – Andrew Ng Google Advance Data Analytics Professional Certificate – Google CERTIFICATIONS Languages : Python, Java, C, C++, SQL Technical Skills : PowerBI, Excel, Data Cleaning & Dashboarding, Data Analytics, ETL, EDA Frameworks & Libraries: TensorFlow, PyTorch, Scikit-learn, Flask, Streamlit, OpenCV, NumPy, Pandas, Matplotlib, LangChain, Pygame, Uvicorn, BeautifulSoup, Selenium Awards/Activities: Professional Assistantship in BITS, 2×Gold in Chess, Bits Tech Fest marketing executive, Al Noor Volunteering, Kenken Volunteering. Hobbies: Running, Movies, Books, Trekking, Fishing, Gym, Chess. ADDITIONAL INFORMATION Customer Purchase Behavior & Product Recommendation Conducted RFM-based customer segmentation and sales trend analysis. Built product recommendation model using market basket analysis. fMRI Brain Signal Reconstruction (Under Prof. Kajal Kansal) Developed deep learning model to reconstruct images from fMRI brain signals. Produced high-quality outputs validated through advanced similarity metrics. Smart Property Insights – AI-Enhanced Real Estate Dashboard Built an AI-driven dashboard for real estate insights using LangChain and FastAPI. Automated data scraping, preprocessing, and NLP-based insight generation. Executive Resource Management Dashboard (Novo Nordisk Hackathon) • Developed an AI dashboard to digitize workforce planning using Python and stats. • Automated resource forecasting with data-driven insights. PROJECTS *More on GitHub [Altrin Titus - CV.pdf / cv] Bachelor of Engineering in Computer Science BITS Pilani Dubai Campus Sep 2022 - Sep 2026 ALTRIN TITUS Computer Science undergraduate passionate about data analytics, machine learning, and artificial intelligence. Skilled in Python, SQL, Power BI, and predictive modeling, with hands-on experience in building ML models and analyzing real-world datasets. Seeking opportunities to apply data- driven techniques to solve complex problems and contribute to innovative AI solutions. OBJECTIVE EDUCATION EXPERIENCE GoBlue International Role: SEO Intern Jul 2024 - Aug 2024 Led SEO team to improve site content and rankings. Conducted data-driven reporting and keyword analysis. Hashgate Jun 2024 - Jul 2024 Led Shopify-based e-commerce site development for tech products. Customized themes, payment gateways, and managed workflows. Role: Shopify E-Commerce Development Intern Lab of Future Role: Software Engineer Trainer Intern Developed embedded systems and Python-based software solutions. Conducted hands-on training sessions in programming and technology. Jul 2025 - Aug 2025 www.linkedin.com/in/Altrin-Titus +971 52 426 4225 https://github.com/altrin7311 altrintitus@gmail.com Al Nahda, Sharjah Landmark Group Role: Data Analytics Intern Built and maintained Power BI and Excel dashboards to monitor Supply Chain KPIs (SLA) across multiple territories, enabling data-driven operational decisions. Developed automated Python-based data pipelines to process and structure 1M+ operational records, improving reporting efficiency and data accuracy. Created advanced DAX measures and KPI logic to ensure accurate performance tracking and standardized reporting across distribution centers. Leveraged AI-assisted analytics and automation techniques to identify performance patterns, support predictive insights, and enhance supply chain reporting processes. Jan 2026 - Present Machine Learning Specialization – Andrew Ng Google Advance Data Analytics Professional Certificate – Google CERTIFICATIONS Languages : Python, Java, C, C++, SQL Technical Skills : PowerBI, Excel, Data Cleaning & Dashboarding, Data Analytics, ETL, EDA Frameworks & Libraries: TensorFlow, PyTorch, Scikit-learn, Flask, Streamlit, OpenCV, NumPy, Pandas, Matplotlib, LangChain, Pygame, Uvicorn, BeautifulSoup, Selenium Awards/Activities: Professional Assistantship in BITS, 2×Gold in Chess, Bits Tech Fest marketing executive, Al Noor Volunteering, Kenken Volunteering. Hobbies: Running, Movies, Books, Trekking, Fishing, Gym, Chess. ADDITIONAL INFORMATION Customer Purchase Behavior & Product Recommendation Conducted RFM-based customer segmentation and sales trend analysis. Built product recommendation model using market basket analysis. fMRI Brain Signal Reconstruction (Under Prof. Kajal Kansal) Developed deep learning model to reconstruct images from fMRI brain signals. Produced high-quality outputs validated through advanced similarity metrics. Smart Property Insights – AI-Enhanced Real Estate Dashboard Built an AI-driven dashboard for real estate insights using LangChain and FastAPI. Automated data scraping, preprocessing, and NLP-based insight generation. Executive Resource Management Dashboard (Novo Nordisk Hackathon) • Developed an AI dashboard to digitize workforce planning using Python and stats. • Automated resource forecasting with data-driven insights. PROJECTS *More on GitHub"
+            - generic [ref=e963]:
+              - generic [ref=e964]: Tailored (new content highlighted)
+              - generic [ref=e965]:
+                - mark [ref=e966]: SUMMARY
+                - mark [ref=e967]: Highly
+                - mark [ref=e968]: motivated
+                - text: data analytics intern with experience in building and
+                - mark [ref=e969]: maintaining
+                - text: Power BI and Excel dashboards, as
+                - mark [ref=e970]: well
+                - text: as
+                - mark [ref=e971]: developing
+                - text: automated
+                - mark [ref=e972]: Python-based
+                - text: data
+                - mark [ref=e973]: pipelines.
+                - text: Skilled in Python, SQL, Power BI, and predictive
+                - mark [ref=e974]: modeling.
+                - text: Seeking to apply
+                - mark [ref=e975]: data-driven
+                - text: techniques to solve complex problems and contribute to innovative AI solutions.
+                - mark [ref=e976]: Experienced
+                - text: in
+                - mark [ref=e977]: creating
+                - text: data reporting and dashboards, with a
+                - mark [ref=e978]: strong
+                - mark [ref=e979]: foundation
+                - text: in data analytics and machine
+                - mark [ref=e980]: learning.
+                - text: EXPERIENCE Data Analytics Intern — Landmark Group (Jan 2026 - Present) • Built and maintained Power BI and Excel dashboards to monitor Supply Chain KPIs (SLA) across multiple territories, enabling
+                - mark [ref=e981]: data-driven
+                - text: operational
+                - mark [ref=e982]: decisions
+                - text: • Developed automated
+                - mark [ref=e983]: Python-based
+                - text: data pipelines to process and structure 1M+ operational records, improving reporting efficiency and data
+                - mark [ref=e984]: accuracy
+                - text: • Created advanced DAX measures and KPI logic to ensure accurate performance tracking and standardized reporting across distribution
+                - mark [ref=e985]: centers
+                - text: • Leveraged
+                - mark [ref=e986]: AI-assisted
+                - text: analytics and automation techniques to identify performance patterns, support predictive insights, and enhance supply chain reporting
+                - mark [ref=e987]: processes
+                - text: SKILLS
+                - mark [ref=e988]: "Featured:"
+                - text: "Python, SQL, Power BI, Data Analytics, ETL, Data Cleaning & Dashboarding Additional: Java, C, C++, Excel, Data Modeling, Machine Learning, TensorFlow, PyTorch,"
+                - mark [ref=e989]: Scikit-learn,
+                - text: Flask, Streamlit, OpenCV, NumPy, Pandas, Matplotlib, LangChain, Pygame, Uvicorn, BeautifulSoup, Selenium PROJECTS Customer Purchase Behavior & Product Recommendation — Conducted
+                - mark [ref=e990]: RFM-based
+                - text: customer segmentation and sales trend analysis. Built product recommendation model using market basket analysis. [Python, SQL, Power BI] fMRI Brain Signal Reconstruction — Developed deep learning model to reconstruct images from fMRI brain signals. Produced
+                - mark [ref=e991]: high-quality
+                - text: outputs validated through advanced similarity metrics. [Python, TensorFlow, PyTorch] Smart Property Insights –
+                - mark [ref=e992]: AI-Enhanced
+                - text: Real Estate Dashboard — Built an
+                - mark [ref=e993]: AI-driven
+                - text: dashboard for real estate insights using LangChain and FastAPI. Automated data scraping, preprocessing, and
+                - mark [ref=e994]: NLP-based
+                - text: insight generation. [Python, LangChain,
+                - mark [ref=e995]: FastAPI]
+                - text: Executive Resource Management Dashboard — Developed an AI dashboard to digitize workforce planning using Python and stats. Automated resource forecasting with
+                - mark [ref=e996]: data-driven
+                - text: insights. [Python,
+                - mark [ref=e997]: Stats]
