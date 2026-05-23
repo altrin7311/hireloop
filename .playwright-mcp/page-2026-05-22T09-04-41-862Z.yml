@@ -1,0 +1,105 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - link "HireLoop HireLoop" [ref=e6] [cursor=pointer]:
+            - /url: /dashboard/feed
+            - generic "HireLoop" [ref=e7]: HL
+            - generic [ref=e8]: HireLoop
+          - navigation [ref=e9]:
+            - link "Feed" [ref=e10] [cursor=pointer]:
+              - /url: /dashboard/feed
+            - link "Applications" [ref=e11] [cursor=pointer]:
+              - /url: /dashboard/applications
+            - link "Profile" [ref=e12] [cursor=pointer]:
+              - /url: /dashboard/profile
+            - link "Settings" [ref=e13] [cursor=pointer]:
+              - /url: /dashboard/settings
+        - generic [ref=e14]:
+          - generic [ref=e15]:
+            - generic [ref=e16]: Auto Apply
+            - switch "Auto Apply" [ref=e17] [cursor=pointer]
+          - generic "djajc@gmail.com" [ref=e19]: DJ
+    - main [ref=e20]:
+      - generic [ref=e21]:
+        - generic [ref=e22]:
+          - heading "Profile" [level=1] [ref=e23]
+          - paragraph [ref=e24]: Upload your CV, cover letter, and supporting documents. HireLoop indexes them for tailored applications.
+        - generic [ref=e26]:
+          - generic [ref=e27]:
+            - generic [ref=e28]: Document type
+            - combobox [ref=e29]:
+              - option "CV / Resume" [selected]
+              - option "Cover letter"
+              - option "Supporting (notes, portfolio)"
+          - button "+ Drop files here, or click to browse PDF, .md, .txt — up to 10MB each" [active] [ref=e30] [cursor=pointer]:
+            - generic [ref=e32]: +
+            - paragraph [ref=e33]: Drop files here, or click to browse
+            - paragraph [ref=e34]: PDF, .md, .txt — up to 10MB each
+          - list [ref=e76]:
+            - listitem [ref=e77]:
+              - generic [ref=e78]:
+                - paragraph [ref=e79]: .sample.pdf
+                - paragraph [ref=e80]: 613 B · 1 chunks
+              - generic [ref=e81]: Done ✓
+        - generic [ref=e35]:
+          - generic [ref=e36]:
+            - heading "Application preferences" [level=2] [ref=e37]
+            - paragraph [ref=e38]: HireLoop uses these to tailor every application. Update them anytime.
+          - generic [ref=e40]:
+            - generic [ref=e41]:
+              - text: Target roles
+              - textbox "Target roles" [ref=e42]:
+                - /placeholder: Senior Frontend Engineer, Staff Engineer
+                - text: Data Analyst
+              - paragraph [ref=e43]: Comma separated.
+            - generic [ref=e44]:
+              - text: Target locations
+              - textbox "Target locations" [ref=e45]:
+                - /placeholder: London, Remote, Berlin
+                - text: Dubai
+              - paragraph [ref=e46]: Comma separated.
+            - generic [ref=e47]:
+              - generic [ref=e48]:
+                - text: Seniority level
+                - combobox "Seniority level" [ref=e49]:
+                  - option "Junior" [selected]
+                  - option "Mid"
+                  - option "Senior"
+                  - option "Lead"
+              - generic [ref=e50]:
+                - text: Tone preference
+                - generic [ref=e51]:
+                  - generic [ref=e52] [cursor=pointer]:
+                    - radio "Formal" [ref=e53]
+                    - generic [ref=e54]: Formal
+                  - generic [ref=e55] [cursor=pointer]:
+                    - radio "Conversational" [checked] [ref=e56]
+                    - generic [ref=e57]: Conversational
+                  - generic [ref=e58] [cursor=pointer]:
+                    - radio "Technical" [ref=e59]
+                    - generic [ref=e60]: Technical
+            - generic [ref=e61]:
+              - generic [ref=e62]:
+                - text: Salary expectation
+                - textbox "Salary expectation" [ref=e63]:
+                  - /placeholder: £90k–£120k (optional)
+                  - text: 60-100k
+              - generic [ref=e64]:
+                - text: Notice period
+                - textbox "Notice period" [ref=e65]:
+                  - /placeholder: 1 month
+                  - text: 1 month
+            - generic [ref=e66]:
+              - text: Always emphasize
+              - textbox "Always emphasize" [ref=e67]:
+                - /placeholder: "One per line.\nE.g. Led migration from REST to gRPC\nShipped to 2M+ users"
+              - paragraph [ref=e68]: Strengths or achievements HireLoop will weave into every application. One per line.
+            - generic [ref=e69]:
+              - text: Never mention
+              - textbox "Never mention" [ref=e70]:
+                - /placeholder: "One per line.\nE.g. Previous employer X\nGap year 2022"
+              - paragraph [ref=e71]: Topics HireLoop will avoid. One per line.
+            - button "Save preferences" [ref=e75]
+  - alert [ref=e74]

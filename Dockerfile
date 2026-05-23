@@ -28,10 +28,17 @@ RUN rm -f pnpm-workspace.yaml
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 
-# Build-time placeholder env vars so client bundle compiles.
-# Real values come from runtime env in docker-compose / Vercel.
-ENV NEXT_PUBLIC_SUPABASE_URL=https://placeholder.supabase.co
-ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=placeholder
+# NEXT_PUBLIC_* must be present at BUILD time — Next inlines them into the
+# client bundle. Passed via docker-compose build args; safe fallbacks below
+# keep `docker build` standalone working.
+ARG NEXT_PUBLIC_SUPABASE_URL
+ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
+ARG NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+ENV NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL:-https://placeholder.supabase.co}
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY:-placeholder}
+ENV NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY:-}
+
+# Server-only DB string only needed to satisfy build-time imports.
 ENV DATABASE_URL=postgres://placeholder:placeholder@placeholder:5432/placeholder
 
 RUN pnpm build

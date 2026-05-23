@@ -97,14 +97,18 @@ failed submissions are free.
 
 ## Running with Docker
 
-Single command spins up both services (Next.js on 3000, Python automation on 8000):
+Both services come up with one command (Next.js on 3000, Python automation on 8000):
 
 ```bash
-docker compose up --build
+docker compose --env-file .env.local up --build
 ```
 
-Requires `.env.local` (Next.js) and `automation/.env` (Python) at repo paths —
-neither is baked into the image; both are passed at runtime via `env_file`.
+`--env-file .env.local` is required so Compose can resolve `NEXT_PUBLIC_*`
+build args from your local secrets file. Next.js inlines those values into
+the client bundle at **build** time — they cannot be injected at runtime.
+
+`.env.local` (Next.js) and `automation/.env` (Python) must exist at repo paths.
+Neither is baked into the image; runtime envs are passed via `env_file`.
 
 ## Running locally
 

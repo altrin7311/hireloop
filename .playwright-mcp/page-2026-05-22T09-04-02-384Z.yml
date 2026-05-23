@@ -1,0 +1,54 @@
+- generic [active] [ref=e1]:
+  - alert [ref=e23]: HireLoop — 5 perfect applications beat 500 generic ones
+  - generic [ref=e24]:
+    - banner [ref=e25]:
+      - generic [ref=e26]:
+        - generic [ref=e27]:
+          - link "HireLoop HireLoop" [ref=e28] [cursor=pointer]:
+            - /url: /dashboard/feed
+            - generic "HireLoop" [ref=e29]: HL
+            - generic [ref=e30]: HireLoop
+          - navigation [ref=e31]:
+            - link "Feed" [ref=e32] [cursor=pointer]:
+              - /url: /dashboard/feed
+            - link "Applications" [ref=e33] [cursor=pointer]:
+              - /url: /dashboard/applications
+            - link "Profile" [ref=e34] [cursor=pointer]:
+              - /url: /dashboard/profile
+            - link "Settings" [ref=e35] [cursor=pointer]:
+              - /url: /dashboard/settings
+        - generic [ref=e36]:
+          - generic [ref=e37]:
+            - generic [ref=e38]: Auto Apply
+            - switch "Auto Apply" [ref=e39] [cursor=pointer]
+          - generic "djajc@gmail.com" [ref=e41]: DJ
+    - main [ref=e42]:
+      - generic [ref=e43]:
+        - generic [ref=e44]:
+          - generic [ref=e45]:
+            - heading "Job Feed" [level=1] [ref=e46]
+            - paragraph [ref=e47]: Ranked by match against your CV. 5 perfect applications beat 500 generic ones.
+          - button "Refresh" [ref=e48]
+        - generic [ref=e49]:
+          - generic [ref=e50]:
+            - generic [ref=e51]: Jobs in feed
+            - generic [ref=e52]: "0"
+          - generic [ref=e53]:
+            - generic [ref=e54]: Above 70% match
+            - generic [ref=e55]: "0"
+          - generic [ref=e56]:
+            - generic [ref=e57]: Auto-applied today
+            - generic [ref=e58]: "0"
+        - generic [ref=e60]:
+          - textbox "Search title, company, location" [ref=e61]
+          - generic [ref=e62]:
+            - button "All" [ref=e63]
+            - button "LinkedIn" [ref=e64]
+            - button "Indeed" [ref=e65]
+            - button "Greenhouse" [ref=e66]
+            - button "Lever" [ref=e67]
+            - button "Workday" [ref=e68]
+          - generic [ref=e69]:
+            - button "All" [ref=e70]
+            - button "70%+" [ref=e71]
+            - button "80%+" [ref=e72]

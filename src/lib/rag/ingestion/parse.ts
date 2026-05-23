@@ -1,3 +1,18 @@
+// pdfjs-dist references DOM globals (DOMMatrix, ImageData, Path2D) even on the
+// text-only Node path. Node 20-alpine lacks them; provide no-op stubs before
+// the dynamic import below resolves the pdfjs module.
+type StubCtor = new (...args: unknown[]) => object;
+const g = globalThis as Record<string, unknown>;
+if (typeof g.DOMMatrix === "undefined") {
+  g.DOMMatrix = class {} as StubCtor;
+}
+if (typeof g.ImageData === "undefined") {
+  g.ImageData = class {} as StubCtor;
+}
+if (typeof g.Path2D === "undefined") {
+  g.Path2D = class {} as StubCtor;
+}
+
 export type FileType = "pdf" | "md" | "txt";
 
 export interface ParsedDocument {
