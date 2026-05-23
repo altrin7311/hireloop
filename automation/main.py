@@ -158,7 +158,7 @@ async def scrape_endpoint(body: ScrapeRequest) -> ScrapeResponse:
 class ApplyRequest(BaseModel):
     application_url: str
     platform: PlatformLiteral
-    tailored_cv: str
+    tailored_cv: Dict[str, Any] = Field(default_factory=dict)
     cover_letter: str
     user_preferences: Dict[str, Any] = Field(default_factory=dict)
     user_id: str
@@ -170,6 +170,28 @@ class ApplyResponse(BaseModel):
     screenshot_b64: str
     message: str
     reason: Optional[str] = None
+    fields_filled: int = 0
+    dry_run: bool = False
+    retry_after: Optional[int] = None
+    metadata: Dict[str, Any] = Field(default_factory=dict)
+
+
+def _retry_after_from_reason(reason: Optional[str]) -> Optional[int]:
+    if not reason:
+        return None
+    if reason.startswith("min_gap:"):
+        # Format: "min_gap:<seconds>s"
+        digits = "".join(ch for ch in reason.split(":", 1)[1] if ch.isdigit())
+        if digits:
+            try:
+                return int(digits)
+            except ValueError:
+                return None
+    if reason.startswith("daily_limit"):
+        return 24 * 3600
+    if reason.startswith("outside_hours"):
+        return 3600
+    return None
 
 
 @app.post("/apply", response_model=ApplyResponse, dependencies=[Depends(require_api_key)])
@@ -187,6 +209,7 @@ async def apply_endpoint(body: ApplyRequest) -> ApplyResponse:
             screenshot_b64="",
             message="blocked by stealth engine",
             reason=reason or "rate_limit",
+            retry_after=_retry_after_from_reason(reason),
         )
 
     result = submit_application(
@@ -198,7 +221,10 @@ async def apply_endpoint(body: ApplyRequest) -> ApplyResponse:
         user_id=body.user_id,
         skip_delay=body.skip_delay,
     )
-    return ApplyResponse(**result.to_dict())
+    return ApplyResponse(
+        retry_after=_retry_after_from_reason(result.reason),
+        **result.to_dict(),
+    )
 
 
 # ----- /health -----------------------------------------------------------------

@@ -1,0 +1,53 @@
+name: HireLoop CI
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Pull your code onto the GitHub machine
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Install Node
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # 3. Install pnpm
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      # 4. Install dependencies
+      - name: Install dependencies
+        run: pnpm install
+        working-directory: HireLoop
+
+      # 5. TypeScript check
+      - name: Typecheck
+        run: pnpm typecheck
+        working-directory: HireLoop
+
+      # 6. Lint
+      - name: Lint
+        run: pnpm lint
+        working-directory: HireLoop
+
+      # 7. Build (catches any build errors)
+      - name: Build
+        run: pnpm build
+        working-directory: HireLoop
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GOOGLE_GENERATIVE_AI_API_KEY: ${{ secrets.GOOGLE_GENERATIVE_AI_API_KEY }}

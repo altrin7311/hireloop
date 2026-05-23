@@ -1,0 +1,116 @@
+Read CLAUDE.md fully. Phases 1-7 complete. Docker working. Stripe integrated.
+Starting Phase 8 — Production Hardening.
+
+TASK 1 — Langfuse observability
+Wire Langfuse tracing that was installed but never connected.
+Add to .env.local:
+  LANGFUSE_SECRET_KEY=
+  LANGFUSE_PUBLIC_KEY=
+  LANGFUSE_HOST=https://cloud.langfuse.com
+
+Trace all 5 agents in src/lib/ai/agents/:
+- job-analyst.ts
+- relevancy.ts
+- cv-writer.ts
+- cover-letter.ts
+- qa-checker.ts
+
+Each trace should capture: input, output, latency, token usage, model name.
+Trace the full orchestrator run as a parent span with child spans per agent.
+
+TASK 2 — Error boundaries + global error handling
+Add error.tsx to all dashboard routes:
+- /dashboard/feed
+- /dashboard/jobs/[id]
+- /dashboard/applications
+- /dashboard/settings
+- /dashboard/dashboard
+
+Add global-error.tsx at app root.
+All errors should show a friendly UI with Topaz palette — not a blank screen.
+Log errors to console with enough context to debug.
+
+TASK 3 — Rate limiting
+Install upstash/ratelimit or use Supabase to implement rate limiting on:
+- /api/generate → max 10 per hour per user
+- /api/apply → max 5 per hour per user  
+- /api/jobs/scrape → max 3 per hour per user
+- /api/stripe/webhook → skip rate limiting (Stripe needs unrestricted access)
+
+Return 429 with a human-readable message and retry-after header.
+
+TASK 4 — PDF upload polyfill fix
+Fix the DOMMatrix not defined error in Docker for PDF uploads.
+Add polyfill in src/lib/pdf-polyfill.ts and import at top of 
+src/app/api/documents/route.ts.
+Test: upload a CV PDF while running in Docker — should succeed.
+
+TASK 5 — Vercel deployment config
+Create vercel.json:
+{
+  "buildCommand": "pnpm build",
+  "installCommand": "pnpm install",
+  "framework": "nextjs",
+  "regions": ["sin1"],
+  "env": {
+    "AUTOMATION_SERVICE_URL": "https://your-railway-app.railway.app"
+  }
+}
+
+Update next.config.ts:
+- Add security headers (X-Frame-Options, CSP, HSTS)
+- Add image domains for any external images
+- Enable standalone output for Docker production build
+
+TASK 6 — Railway config for Python service
+Create automation/railway.json:
+{
+  "build": { "builder": "DOCKERFILE", "dockerfilePath": "Dockerfile" },
+  "deploy": { 
+    "startCommand": "uvicorn main:app --host 0.0.0.0 --port $PORT",
+    "healthcheckPath": "/health",
+    "restartPolicyType": "ON_FAILURE"
+  }
+}
+
+Add GET /health endpoint to automation/main.py returning { status: "ok", timestamp }.
+
+TASK 7 — Environment validation
+Create src/lib/env.ts using zod:
+- Validate all required env vars on startup
+- Throw a clear error if any are missing
+- Export typed env object used everywhere instead of process.env directly
+
+TASK 8 — Loading skeletons
+Add skeleton loading states using shadcn/ui Skeleton to:
+- Job feed cards while scraping
+- Generation view while agents run
+- Applications table while fetching
+- Dashboard stats while loading
+Use Topaz palette, match existing design.
+
+TASK 9 — SEO + metadata
+Add metadata to all pages in src/app/:
+- Title: "HireLoop — [Page Name]"
+- Description relevant to each page
+- Open Graph tags for social sharing
+- Add src/app/sitemap.ts
+- Add src/app/robots.ts
+
+TASK 10 — Final production checks
+Run all of these and fix any errors:
+- pnpm typecheck (must be clean)
+- pnpm lint (must be clean)  
+- pnpm build (must succeed)
+- docker compose --env-file .env.local up --build (both services must start)
+- Test PDF upload in Docker (Task 4 fix verified)
+- Test Stripe webhook end to end
+- Test apply flow with DRY_RUN=true
+
+Create testing/PHASE8_TESTING.md documenting:
+- How to verify Langfuse traces
+- How to test rate limiting
+- How to deploy to Vercel + Railway
+- All environment variables needed for production
+
+Work autonomously. Fix all errors. Run pnpm typecheck at the end. Report at end.

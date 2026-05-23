@@ -64,6 +64,8 @@ const PatchSchema = z.object({
   work_authorization: z.boolean().optional(),
   requires_sponsorship: z.boolean().optional(),
   preferred_name: z.string().optional(),
+  contact_email: z.string().email().optional(),
+  contact_phone: z.string().optional(),
 });
 
 export async function PATCH(request: NextRequest): Promise<NextResponse> {
@@ -97,6 +99,8 @@ export async function PATCH(request: NextRequest): Promise<NextResponse> {
   if (patch.requires_sponsorship !== undefined)
     updateSet.requiresSponsorship = patch.requires_sponsorship;
   if (patch.preferred_name !== undefined) updateSet.preferredName = patch.preferred_name;
+  if (patch.contact_email !== undefined) updateSet.contactEmail = patch.contact_email;
+  if (patch.contact_phone !== undefined) updateSet.contactPhone = patch.contact_phone;
 
   if (Object.keys(updateSet).length === 0) {
     return NextResponse.json({ error: "No fields to update" }, { status: 400 });

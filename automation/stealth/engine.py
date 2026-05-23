@@ -15,7 +15,11 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from threading import Lock
-from typing import Dict, List, Optional, Tuple
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple
+
+if TYPE_CHECKING:  # pragma: no cover — type-only import
+    from selenium.webdriver.remote.webdriver import WebDriver
+    from selenium.webdriver.remote.webelement import WebElement
 
 logger = logging.getLogger("hireloop.stealth.engine")
 
@@ -173,10 +177,63 @@ def typing_delay_for_char() -> float:
     return base * random.uniform(0.6, 1.4)
 
 
+def _fast_mode() -> bool:
+    raw = os.environ.get("FAST_MODE", "")
+    return raw.strip().lower() in {"1", "true", "yes", "on"}
+
+
 def pre_apply_read_delay() -> float:
+    if _fast_mode():
+        return 0.0
     return randomise_delay(
         HUMAN_BEHAVIOUR["pre_apply_read_min_seconds"],
         HUMAN_BEHAVIOUR["pre_apply_read_max_seconds"],
+    )
+
+
+def read_page_delay() -> float:
+    """Alias matching Phase 6 spec — sleeps 30-90s; FAST_MODE skips it."""
+    return pre_apply_read_delay()
+
+
+def pre_submit_pause() -> float:
+    """Short 2-5s pause before clicking the final submit button."""
+    if _fast_mode():
+        return 0.0
+    return randomise_delay(2.0, 5.0)
+
+
+def type_like_human(driver: Any, element: "WebElement", text: str) -> None:
+    """Type ``text`` into ``element`` one character at a time with WPM-paced jitter.
+
+    ``driver`` is accepted for API symmetry / future use (e.g., scroll into view)
+    but the body only needs the element. FAST_MODE collapses to a single send_keys.
+    """
+    if not text:
+        return
+
+    if _fast_mode():
+        try:
+            element.send_keys(text)
+        except Exception as exc:  # noqa: BLE001 — caller handles broader errors
+            logger.warning("type_like_human[fast]: %s", exc)
+        return
+
+    for ch in text:
+        try:
+            element.send_keys(ch)
+        except Exception as exc:  # noqa: BLE001 — best-effort; abort if element dies
+            logger.warning("type_like_human: send_keys failed at char=%r: %s", ch, exc)
+            return
+        # Per-character delay is roughly 50-150ms once WPM jitter applies.
+        time.sleep(max(0.04, min(0.20, typing_delay_for_char())))
+    # Occasional micro-pause between fields.
+    time.sleep(
+        random.uniform(
+            HUMAN_BEHAVIOUR["between_field_min_seconds"],
+            HUMAN_BEHAVIOUR["between_field_max_seconds"],
+        )
+        / 4.0
     )
 
 

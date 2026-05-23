@@ -424,3 +424,7 @@ AUTOMATION_API_KEY=           # Shared secret between Next.js and Python service
 5. Ghost jobs auto-skipped — no AI generation wasted on them
 6. Never submit without user confirmation (manual mode)
 7. All user documents are PII — RLS on all tables, never logged
+8. Always make a testing file for each phase and put it in testing folder
+
+## Design Reference
+design-reference/hireloop - contains all the reference files for the design replicate this ALWAYS

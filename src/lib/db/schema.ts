@@ -62,6 +62,8 @@ export const userPreferences = pgTable("user_preferences", {
   workAuthorization: boolean("work_authorization"),
   requiresSponsorship: boolean("requires_sponsorship"),
   preferredName: text("preferred_name"),
+  contactEmail: text("contact_email"),
+  contactPhone: text("contact_phone"),
   autoApply: boolean("auto_apply").notNull().default(false),
 });
 

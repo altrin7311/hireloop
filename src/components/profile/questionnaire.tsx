@@ -14,6 +14,9 @@ const SENIORITY_OPTIONS = ["junior", "mid", "senior", "lead"] as const;
 const TONE_OPTIONS = ["formal", "conversational", "technical"] as const;
 
 const FormSchema = z.object({
+  preferredName: z.string().min(1, "Required"),
+  contactEmail: z.string().email("Valid email required"),
+  contactPhone: z.string().min(1, "Required"),
   targetRoles: z.string().min(1, "Required"),
   targetLocations: z.string().min(1, "Required"),
   seniorityLevel: z.enum(SENIORITY_OPTIONS),
@@ -27,6 +30,9 @@ const FormSchema = z.object({
 type FormValues = z.infer<typeof FormSchema>;
 
 interface PreferencesRow {
+  preferredName: string | null;
+  contactEmail: string | null;
+  contactPhone: string | null;
   targetRoles: string[] | null;
   targetLocations: string[] | null;
   seniorityLevel: string | null;
@@ -70,6 +76,9 @@ export function Questionnaire(): React.JSX.Element {
   const form = useForm<FormValues>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
+      preferredName: "",
+      contactEmail: "",
+      contactPhone: "",
       targetRoles: "",
       targetLocations: "",
       seniorityLevel: "mid",
@@ -91,6 +100,9 @@ export function Questionnaire(): React.JSX.Element {
         if (cancelled || !json.preferences) return;
         const p = json.preferences;
         form.reset({
+          preferredName: p.preferredName ?? "",
+          contactEmail: p.contactEmail ?? "",
+          contactPhone: p.contactPhone ?? "",
           targetRoles: arrToCsv(p.targetRoles),
           targetLocations: arrToCsv(p.targetLocations),
           seniorityLevel: isSeniority(p.seniorityLevel) ? p.seniorityLevel : "mid",
@@ -120,6 +132,9 @@ export function Questionnaire(): React.JSX.Element {
   const onSubmit = form.handleSubmit(async (values) => {
     try {
       const body = {
+        preferred_name: values.preferredName.trim(),
+        contact_email: values.contactEmail.trim(),
+        contact_phone: values.contactPhone.trim(),
         target_roles: csvToArr(values.targetRoles),
         target_locations: csvToArr(values.targetLocations),
         seniority_level: values.seniorityLevel,
@@ -153,6 +168,49 @@ export function Questionnaire(): React.JSX.Element {
   return (
     <div className="relative">
       <form onSubmit={onSubmit} className="space-y-5">
+        <div className="grid gap-5 md:grid-cols-3">
+          <div className="space-y-1.5">
+            <Label htmlFor="preferredName">Name (as on applications)</Label>
+            <Input
+              id="preferredName"
+              placeholder="Jane Doe"
+              {...form.register("preferredName")}
+            />
+            {form.formState.errors.preferredName ? (
+              <p className="text-xs" style={{ color: "#A05E00" }}>
+                {form.formState.errors.preferredName.message}
+              </p>
+            ) : null}
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="contactEmail">Contact email</Label>
+            <Input
+              id="contactEmail"
+              type="email"
+              placeholder="you@example.com"
+              {...form.register("contactEmail")}
+            />
+            {form.formState.errors.contactEmail ? (
+              <p className="text-xs" style={{ color: "#A05E00" }}>
+                {form.formState.errors.contactEmail.message}
+              </p>
+            ) : null}
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="contactPhone">Contact phone</Label>
+            <Input
+              id="contactPhone"
+              placeholder="+44 7700 900123"
+              {...form.register("contactPhone")}
+            />
+            {form.formState.errors.contactPhone ? (
+              <p className="text-xs" style={{ color: "#A05E00" }}>
+                {form.formState.errors.contactPhone.message}
+              </p>
+            ) : null}
+          </div>
+        </div>
+
         <div className="space-y-1.5">
           <Label htmlFor="targetRoles">Target roles</Label>
           <Input
