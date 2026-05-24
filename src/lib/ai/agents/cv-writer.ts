@@ -127,7 +127,7 @@ export async function runCVWriter(
     }
     const parsed = parseTailoredCV(buffer);
 
-    const usage = await result.usage.catch(() => undefined);
+    const usage = await Promise.resolve(result.usage).catch(() => undefined);
     span.finish({
       output: parsed,
       usage: usage

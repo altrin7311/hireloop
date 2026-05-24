@@ -93,7 +93,7 @@ export async function runCoverLetter(
       options.onDelta?.(delta);
     }
     const trimmed = full.trim();
-    const usage = await result.usage.catch(() => undefined);
+    const usage = await Promise.resolve(result.usage).catch(() => undefined);
     span.finish({
       output: trimmed,
       usage: usage

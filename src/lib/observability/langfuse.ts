@@ -120,7 +120,6 @@ export function startAgentSpan({ trace, agent, model, input }: AgentSpanInput): 
       try {
         generation?.end({
           output,
-          endTime: new Date(),
           usage,
           level,
           statusMessage,
@@ -134,7 +133,6 @@ export function startAgentSpan({ trace, agent, model, input }: AgentSpanInput): 
       try {
         generation?.end({
           output: { error: message },
-          endTime: new Date(),
           level: "ERROR",
           statusMessage: message,
         });
