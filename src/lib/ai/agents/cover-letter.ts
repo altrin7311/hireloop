@@ -1,4 +1,5 @@
 import { groq } from "@ai-sdk/groq";
+import type { LangfuseTraceClient } from "langfuse";
 import { streamText } from "ai";
 
 import type { DocumentChunk, UserPreferences } from "@/lib/db/schema";
@@ -7,6 +8,7 @@ import {
   GROQ_MODEL,
   type JobAnalysis,
 } from "@/lib/ai/agents/types";
+import { startAgentSpan } from "@/lib/observability/langfuse";
 
 export const BANNED_WORDS = [
   "passionate",
@@ -60,6 +62,7 @@ Write the cover letter now. 3 paragraphs. Plain text only.`;
 
 export interface CoverLetterOptions {
   onDelta?: (delta: string) => void;
+  trace?: LangfuseTraceClient | null;
 }
 
 export async function runCoverLetter(
@@ -68,17 +71,42 @@ export async function runCoverLetter(
   userPreferences: UserPreferences,
   options: CoverLetterOptions = {},
 ): Promise<string> {
-  const result = streamText({
-    model: groq(GROQ_MODEL),
-    temperature: 0.7,
-    system: SYSTEM_PROMPT,
-    prompt: buildPrompt(jobAnalysis, relevantChunks, userPreferences),
+  const prompt = buildPrompt(jobAnalysis, relevantChunks, userPreferences);
+  const span = startAgentSpan({
+    trace: options.trace ?? null,
+    agent: "cover-letter",
+    model: GROQ_MODEL,
+    input: { system: SYSTEM_PROMPT, prompt },
   });
 
-  let full = "";
-  for await (const delta of result.textStream) {
-    full += delta;
-    options.onDelta?.(delta);
+  try {
+    const result = streamText({
+      model: groq(GROQ_MODEL),
+      temperature: 0.7,
+      system: SYSTEM_PROMPT,
+      prompt,
+    });
+
+    let full = "";
+    for await (const delta of result.textStream) {
+      full += delta;
+      options.onDelta?.(delta);
+    }
+    const trimmed = full.trim();
+    const usage = await result.usage.catch(() => undefined);
+    span.finish({
+      output: trimmed,
+      usage: usage
+        ? {
+            input: usage.inputTokens,
+            output: usage.outputTokens,
+            total: usage.totalTokens,
+          }
+        : undefined,
+    });
+    return trimmed;
+  } catch (err) {
+    span.fail(err);
+    throw err;
   }
-  return full.trim();
 }

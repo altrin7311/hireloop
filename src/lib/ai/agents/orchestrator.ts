@@ -11,11 +11,18 @@ import type {
   QAReport,
   TailoredCV,
 } from "@/lib/ai/agents/types";
+import {
+  createPipelineTrace,
+  flushLangfuse,
+} from "@/lib/observability/langfuse";
 
 export interface PipelineInput {
   userId: string;
   jobDescription: string;
   userPreferences: UserPreferences;
+  jobId?: string;
+  jobTitle?: string;
+  company?: string;
 }
 
 export interface PipelineResult {
@@ -84,6 +91,13 @@ async function timed<T>(
 export async function* runPipeline(
   input: PipelineInput,
 ): AsyncGenerator<PipelineEvent, PipelineResult | null, void> {
+  const trace = createPipelineTrace({
+    userId: input.userId,
+    jobId: input.jobId,
+    jobTitle: input.jobTitle,
+    company: input.company,
+  });
+
   const eventBuffer: PipelineEvent[] = [];
   const emit = (e: PipelineEvent): void => {
     eventBuffer.push(e);
@@ -99,7 +113,7 @@ export async function* runPipeline(
     // STEP 1 — Job Analyst
     const jobAnalysis = await timed(
       "job-analyst",
-      () => runJobAnalyst(input.jobDescription),
+      () => runJobAnalyst(input.jobDescription, trace),
       emit,
     );
     yield* flush();
@@ -107,7 +121,7 @@ export async function* runPipeline(
     // STEP 2 — Relevancy
     const relevantChunks = await timed(
       "relevancy",
-      () => runRelevancy(input.userId, jobAnalysis),
+      () => runRelevancy(input.userId, jobAnalysis, trace),
       emit,
     );
     yield* flush();
@@ -118,6 +132,7 @@ export async function* runPipeline(
         message:
           "No relevant document chunks found. Upload your CV and supporting docs in Profile first.",
       };
+      await flushLangfuse();
       return null;
     }
 
@@ -130,7 +145,7 @@ export async function* runPipeline(
     const cvT0 = Date.now();
     const clT0 = Date.now();
 
-    const cvPromise = runCVWriter(jobAnalysis, relevantChunks, input.userPreferences)
+    const cvPromise = runCVWriter(jobAnalysis, relevantChunks, input.userPreferences, trace)
       .then((cv) => {
         queue.push({
           type: "agent:complete",
@@ -151,6 +166,7 @@ export async function* runPipeline(
       relevantChunks,
       input.userPreferences,
       {
+        trace,
         onDelta: (delta) => {
           queue.push({ type: "content:delta", field: "coverLetter", text: delta });
         },
@@ -185,6 +201,7 @@ export async function* runPipeline(
         cvSettled.status === "rejected" ? cvSettled.reason : clSettled.status === "rejected" ? clSettled.reason : null;
       const message = reason instanceof Error ? reason.message : "writer agent failed";
       yield { type: "pipeline:error", message };
+      await flushLangfuse();
       return null;
     }
 
@@ -194,16 +211,18 @@ export async function* runPipeline(
     // STEP 4 — QA
     const qaReport = await timed(
       "qa-checker",
-      () => runQAChecker(tailoredCV, coverLetter, relevantChunks, jobAnalysis),
+      () => runQAChecker(tailoredCV, coverLetter, relevantChunks, jobAnalysis, trace),
       emit,
     );
     yield* flush();
 
+    await flushLangfuse();
     return { tailoredCV, coverLetter, qaReport, relevantChunks };
   } catch (err) {
     yield* flush();
     const message = err instanceof Error ? err.message : "pipeline failed";
     yield { type: "pipeline:error", message };
+    await flushLangfuse();
     return null;
   }
 }

@@ -5,6 +5,7 @@ import { z } from "zod";
 import { db, schema } from "@/lib/db";
 import { createClient } from "@/lib/db/supabase/server";
 import type { TailoredCV } from "@/lib/ai/agents/types";
+import { consumeRateLimit, rateLimitHeaders } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -74,6 +75,21 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
   if (!AUTOMATION_API_KEY) {
     return NextResponse.json({ error: "AUTOMATION_API_KEY not set" }, { status: 500 });
+  }
+
+  const rate = await consumeRateLimit(userId, "apply");
+  if (!rate.ok) {
+    return NextResponse.json(
+      {
+        error: `You can submit at most ${rate.limit} applications per hour. Try again in ~${Math.ceil(rate.retryAfter / 60)} minute(s).`,
+        reason: "rate_limit",
+        retryAfter: rate.retryAfter,
+      },
+      {
+        status: 429,
+        headers: { ...rateLimitHeaders(rate), "Retry-After": String(rate.retryAfter) },
+      },
+    );
   }
 
   let body: z.infer<typeof BodySchema>;

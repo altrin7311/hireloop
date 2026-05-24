@@ -1,4 +1,5 @@
 import { groq } from "@ai-sdk/groq";
+import type { LangfuseTraceClient } from "langfuse";
 import { generateObject } from "ai";
 import { z } from "zod";
 
@@ -11,6 +12,7 @@ import {
   type QAReport,
   type TailoredCV,
 } from "@/lib/ai/agents/types";
+import { startAgentSpan } from "@/lib/observability/langfuse";
 
 const IssueSchema = z.object({
   type: z.string().min(1),
@@ -78,18 +80,40 @@ export async function runQAChecker(
   coverLetter: string,
   relevantChunks: DocumentChunk[],
   jobAnalysis: JobAnalysis,
+  trace: LangfuseTraceClient | null = null,
 ): Promise<QAReport> {
-  const result = await generateObject({
-    model: groq(GROQ_STRUCTURED_MODEL),
-    schema: QAReportSchema,
-    temperature: 0.1,
-    system: SYSTEM_PROMPT,
-    prompt: buildPrompt(tailoredCV, coverLetter, relevantChunks, jobAnalysis),
+  const prompt = buildPrompt(tailoredCV, coverLetter, relevantChunks, jobAnalysis);
+  const span = startAgentSpan({
+    trace,
+    agent: "qa-checker",
+    model: GROQ_STRUCTURED_MODEL,
+    input: { system: SYSTEM_PROMPT, prompt },
   });
 
-  const report = result.object;
-  console.log(
-    `[qa-checker] approved=${report.approved} score=${report.qualityScore} issues=${report.issues.length}`,
-  );
-  return report;
+  try {
+    const result = await generateObject({
+      model: groq(GROQ_STRUCTURED_MODEL),
+      schema: QAReportSchema,
+      temperature: 0.1,
+      system: SYSTEM_PROMPT,
+      prompt,
+    });
+
+    const report = result.object;
+    console.log(
+      `[qa-checker] approved=${report.approved} score=${report.qualityScore} issues=${report.issues.length}`,
+    );
+    span.finish({
+      output: report,
+      usage: {
+        input: result.usage?.inputTokens,
+        output: result.usage?.outputTokens,
+        total: result.usage?.totalTokens,
+      },
+    });
+    return report;
+  } catch (err) {
+    span.fail(err);
+    throw err;
+  }
 }

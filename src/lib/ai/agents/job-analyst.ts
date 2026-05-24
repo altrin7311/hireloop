@@ -1,8 +1,10 @@
 import { groq } from "@ai-sdk/groq";
+import type { LangfuseTraceClient } from "langfuse";
 import { generateObject } from "ai";
 import { z } from "zod";
 
 import { GROQ_STRUCTURED_MODEL, type JobAnalysis } from "@/lib/ai/agents/types";
+import { startAgentSpan } from "@/lib/observability/langfuse";
 
 const JobAnalysisSchema = z.object({
   roleTitle: z.string().min(1),
@@ -25,18 +27,42 @@ Rules:
 - reasoning: 1-2 sentences explaining tone + seniority calls.
 - Do not invent skills. Use the JD's own wording.`;
 
-export async function runJobAnalyst(jobDescription: string): Promise<JobAnalysis> {
-  const result = await generateObject({
-    model: groq(GROQ_STRUCTURED_MODEL),
-    schema: JobAnalysisSchema,
-    temperature: 0.1,
-    system: SYSTEM_PROMPT,
-    prompt: `Extract structured analysis from this listing.\n\n<job_description>\n${jobDescription}\n</job_description>`,
+export async function runJobAnalyst(
+  jobDescription: string,
+  trace: LangfuseTraceClient | null = null,
+): Promise<JobAnalysis> {
+  const prompt = `Extract structured analysis from this listing.\n\n<job_description>\n${jobDescription}\n</job_description>`;
+  const span = startAgentSpan({
+    trace,
+    agent: "job-analyst",
+    model: GROQ_STRUCTURED_MODEL,
+    input: { system: SYSTEM_PROMPT, prompt },
   });
 
-  const analysis = result.object;
-  console.log(
-    `[job-analyst] extracted ${analysis.mustHaveSkills.length} must-have skills, ${analysis.niceToHaveSkills.length} nice-to-have`,
-  );
-  return analysis;
+  try {
+    const result = await generateObject({
+      model: groq(GROQ_STRUCTURED_MODEL),
+      schema: JobAnalysisSchema,
+      temperature: 0.1,
+      system: SYSTEM_PROMPT,
+      prompt,
+    });
+
+    const analysis = result.object;
+    console.log(
+      `[job-analyst] extracted ${analysis.mustHaveSkills.length} must-have skills, ${analysis.niceToHaveSkills.length} nice-to-have`,
+    );
+    span.finish({
+      output: analysis,
+      usage: {
+        input: result.usage?.inputTokens,
+        output: result.usage?.outputTokens,
+        total: result.usage?.totalTokens,
+      },
+    });
+    return analysis;
+  } catch (err) {
+    span.fail(err);
+    throw err;
+  }
 }

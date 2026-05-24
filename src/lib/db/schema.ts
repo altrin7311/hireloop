@@ -176,3 +176,22 @@ export type UserJobScore = typeof userJobScores.$inferSelect;
 export type NewUserJobScore = typeof userJobScores.$inferInsert;
 export type Application = typeof applications.$inferSelect;
 export type NewApplication = typeof applications.$inferInsert;
+
+export const rateLimits = pgTable(
+  "rate_limits",
+  {
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => authUsers.id, { onDelete: "cascade" }),
+    bucket: text("bucket").notNull(),
+    windowStart: timestamp("window_start", { withTimezone: true }).notNull(),
+    hits: integer("hits").notNull().default(0),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    pk: unique("rate_limits_pk").on(t.userId, t.bucket, t.windowStart),
+  }),
+);
+
+export type RateLimitRow = typeof rateLimits.$inferSelect;
+export type NewRateLimitRow = typeof rateLimits.$inferInsert;

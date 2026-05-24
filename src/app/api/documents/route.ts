@@ -1,3 +1,6 @@
+// Must come before any transitive pdfjs-dist import.
+import "@/lib/pdf-polyfill";
+
 import { randomUUID } from "node:crypto";
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/db/supabase/server";

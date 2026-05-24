@@ -1,10 +1,12 @@
 import { sql } from "drizzle-orm";
+import type { LangfuseTraceClient } from "langfuse";
 
 import { db } from "@/lib/db";
 import type { DocumentChunk } from "@/lib/db/schema";
 import { embedQuery } from "@/lib/rag/embeddings/google";
 
 import type { JobAnalysis } from "@/lib/ai/agents/types";
+import { startAgentSpan } from "@/lib/observability/langfuse";
 
 const TOP_K = 8;
 
@@ -44,41 +46,62 @@ function mapRow(row: ChunkRow): DocumentChunk {
 export async function runRelevancy(
   userId: string,
   jobAnalysis: JobAnalysis,
+  trace: LangfuseTraceClient | null = null,
 ): Promise<DocumentChunk[]> {
   const query = jobAnalysis.mustHaveSkills.join(", ").trim();
+  const span = startAgentSpan({
+    trace,
+    agent: "relevancy",
+    model: "gemini-embedding-001",
+    input: { userId, query },
+  });
+
   if (!query) {
     console.log("[relevancy] no must-have skills, returning 0 chunks");
+    span.finish({ output: { chunks: 0, reason: "no_query" } });
     return [];
   }
 
-  const vector = await embedQuery(query);
-  const vecLit = `[${vector.join(",")}]`;
+  try {
+    const vector = await embedQuery(query);
+    const vecLit = `[${vector.join(",")}]`;
 
-  const rows = (await db().execute(sql`
-    SELECT
-      id,
-      user_id,
-      source_file,
-      file_id,
-      chunk_type,
-      chunk_index,
-      content,
-      word_count,
-      pinecone_id,
-      file_type,
-      uploaded_at,
-      1 - (embedding <=> ${vecLit}::vector) AS similarity
-    FROM document_chunks
-    WHERE user_id = ${userId}::uuid
-      AND embedding IS NOT NULL
-    ORDER BY embedding <=> ${vecLit}::vector
-    LIMIT ${TOP_K}
-  `)) as unknown as ChunkRow[];
+    const rows = (await db().execute(sql`
+      SELECT
+        id,
+        user_id,
+        source_file,
+        file_id,
+        chunk_type,
+        chunk_index,
+        content,
+        word_count,
+        pinecone_id,
+        file_type,
+        uploaded_at,
+        1 - (embedding <=> ${vecLit}::vector) AS similarity
+      FROM document_chunks
+      WHERE user_id = ${userId}::uuid
+        AND embedding IS NOT NULL
+      ORDER BY embedding <=> ${vecLit}::vector
+      LIMIT ${TOP_K}
+    `)) as unknown as ChunkRow[];
 
-  const chunks = rows.map(mapRow);
-  const topSim = rows[0] ? Number(rows[0].similarity) : 0;
-  console.log(
-    `[relevancy] retrieved ${chunks.length} chunks, top similarity: ${topSim.toFixed(3)}`,
-  );
-  return chunks;
+    const chunks = rows.map(mapRow);
+    const topSim = rows[0] ? Number(rows[0].similarity) : 0;
+    console.log(
+      `[relevancy] retrieved ${chunks.length} chunks, top similarity: ${topSim.toFixed(3)}`,
+    );
+    span.finish({
+      output: {
+        chunks: chunks.length,
+        topSimilarity: topSim,
+        sources: chunks.map((c) => c.sourceFile),
+      },
+    });
+    return chunks;
+  } catch (err) {
+    span.fail(err);
+    throw err;
+  }
 }

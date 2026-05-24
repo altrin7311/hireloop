@@ -6,6 +6,7 @@ import { runPipeline } from "@/lib/ai/agents/orchestrator";
 import type { PipelineEvent } from "@/lib/ai/agents/types";
 import { db, schema } from "@/lib/db";
 import { createClient } from "@/lib/db/supabase/server";
+import { consumeRateLimit, rateLimitHeaders } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -43,6 +44,20 @@ export async function POST(request: NextRequest): Promise<Response> {
   const auth = await requireUser();
   if (!auth.ok) return auth.response;
   const userId = auth.userId;
+
+  const rate = await consumeRateLimit(userId, "generate");
+  if (!rate.ok) {
+    return NextResponse.json(
+      {
+        error: `Rate limit reached. Try again in ~${Math.ceil(rate.retryAfter / 60)} minute(s).`,
+        retryAfter: rate.retryAfter,
+      },
+      {
+        status: 429,
+        headers: { ...rateLimitHeaders(rate), "Retry-After": String(rate.retryAfter) },
+      },
+    );
+  }
 
   let body: z.infer<typeof BodySchema>;
   try {
@@ -121,6 +136,9 @@ export async function POST(request: NextRequest): Promise<Response> {
           userId,
           jobDescription,
           userPreferences,
+          jobId: jobRecord.id,
+          jobTitle: jobRecord.title,
+          company: jobRecord.company,
         });
 
         let result: Awaited<ReturnType<typeof iter.next>>;

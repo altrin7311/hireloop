@@ -1,4 +1,5 @@
 import { groq } from "@ai-sdk/groq";
+import type { LangfuseTraceClient } from "langfuse";
 import { streamText } from "ai";
 
 import type { DocumentChunk, UserPreferences } from "@/lib/db/schema";
@@ -8,6 +9,7 @@ import {
   type JobAnalysis,
   type TailoredCV,
 } from "@/lib/ai/agents/types";
+import { startAgentSpan } from "@/lib/observability/langfuse";
 
 const SYSTEM_PROMPT = `You are an expert CV writer for HireLoop. You rewrite a candidate's CV sections to match a specific role.
 
@@ -101,17 +103,45 @@ export async function runCVWriter(
   jobAnalysis: JobAnalysis,
   relevantChunks: DocumentChunk[],
   userPreferences: UserPreferences,
+  trace: LangfuseTraceClient | null = null,
 ): Promise<TailoredCV> {
-  const result = streamText({
-    model: groq(GROQ_MODEL),
-    temperature: 0.4,
-    system: SYSTEM_PROMPT,
-    prompt: buildPrompt(jobAnalysis, relevantChunks, userPreferences),
+  const prompt = buildPrompt(jobAnalysis, relevantChunks, userPreferences);
+  const span = startAgentSpan({
+    trace,
+    agent: "cv-writer",
+    model: GROQ_MODEL,
+    input: { system: SYSTEM_PROMPT, prompt },
   });
 
-  let buffer = "";
-  for await (const delta of result.textStream) {
-    buffer += delta;
+  try {
+    const result = streamText({
+      model: groq(GROQ_MODEL),
+      temperature: 0.4,
+      system: SYSTEM_PROMPT,
+      prompt,
+    });
+
+    let buffer = "";
+    for await (const delta of result.textStream) {
+      buffer += delta;
+    }
+    const parsed = parseTailoredCV(buffer);
+
+    const usage = await result.usage.catch(() => undefined);
+    span.finish({
+      output: parsed,
+      usage: usage
+        ? {
+            input: usage.inputTokens,
+            output: usage.outputTokens,
+            total: usage.totalTokens,
+          }
+        : undefined,
+    });
+
+    return parsed;
+  } catch (err) {
+    span.fail(err);
+    throw err;
   }
-  return parseTailoredCV(buffer);
 }
